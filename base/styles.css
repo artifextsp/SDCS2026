@@ -1,0 +1,51 @@
+/* Estilo monocromático, minimalista y profesional (escala de grises) */
+:root{
+  --bg:#f6f7f8;
+  --surface:#ffffff;
+  --surface-2:#fafafa;
+  --border:#e5e7eb;
+  --text:#111827;
+  --muted:#6b7280;
+  --accent:#111111;
+  --accent-contrast:#ffffff;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,Arial;
+  color:var(--text);
+  background:radial-gradient(1000px 600px at 50% -20%,#ffffff,var(--bg));
+  display:grid;place-items:center;padding:24px;
+}
+.card{
+  width:min(480px,94vw);
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:28px;
+  box-shadow:0 20px 60px rgba(0,0,0,.06);
+}
+.h{font-size:1.5rem;margin:0 0 12px;letter-spacing:.2px}
+.p{color:var(--muted);margin:0 0 18px}
+label{display:block;font-size:.95rem;color:var(--muted);margin:12px 0 8px}
+.input{
+  width:100%;appearance:none;padding:13px 14px;border-radius:12px;
+  border:1px solid var(--border);background:#fff;color:var(--text);font-size:1rem;
+}
+.input:focus{outline:none;border-color:#d1d5db;box-shadow:0 0 0 4px rgba(17,17,17,.06)}
+button{
+  width:100%;margin-top:16px;padding:12px 14px;border-radius:12px;
+  border:1px solid var(--accent);background:var(--accent);color:var(--accent-contrast);
+  font-weight:600;letter-spacing:.2px;cursor:pointer
+}
+button:hover{filter:brightness(1.08)}
+button:active{transform:translateY(1px)}
+button[disabled]{opacity:.6;cursor:not-allowed}
+.msg{
+  margin-top:14px;padding:12px 14px;background:var(--surface-2);
+  border:1px solid var(--border);border-left:4px solid #9ca3af;border-radius:12px;color:var(--text)
+}
+.msg.ok{border-left-color:#4b5563}
+.msg.err{border-left-color:#1f2937}
+.footer{margin-top:18px;text-align:center;color:var(--muted);font-size:.9rem}
