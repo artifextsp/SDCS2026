@@ -1,2 +1,77 @@
-/* Ajustes sutiles exclusivos para la vista de administrador (opcional) */
-.card { border-color: #3a3a3a; }
+:root{
+  --bg:#f7f7f8; --surface-1:#ffffff; --surface-2:#f2f3f5; --border:#e5e7eb;
+  --text:#111827; --muted:#6b7280;
+  --accent:#63b3ff; --accent-ink:#1f6fb3; --accent-soft:#eaf4ff;
+}
+
+body{background:var(--bg);color:var(--text)}
+.card{background:var(--surface-1);border:1px solid var(--border);border-radius:16px;padding:20px;margin:28px auto;width:min(900px,95vw);box-shadow:0 10px 24px rgba(0,0,0,.04)}
+.card-auth{width:min(480px,92vw)}
+.card-dash{width:min(980px,94vw)}
+
+.h{color:var(--accent-ink);margin:0 0 8px}
+.p{color:var(--muted)} .p strong{color:var(--accent-ink)}
+.input{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:12px;background:#fff}
+
+.msg{margin-top:12px;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:var(--surface-2);color:var(--muted)}
+.msg.ok{background:#ecfdf5;border-color:#10b981;color:#065f46}
+.msg.err{background:#fff7ed;border-color:#f59e0b;color:#92400e}
+
+/* botones */
+button{appearance:none;border:1px solid var(--border);background:var(--surface-2);color:var(--text);
+  padding:10px 14px;border-radius:12px;font-weight:600;cursor:pointer;width:auto;}
+button:hover{filter:brightness(1.02)} button:disabled{opacity:.55;cursor:not-allowed}
+.btn-ghost{background:#fff;color:var(--text);border:1px solid var(--border);display:flex;align-items:center;gap:10px;font-weight:700}
+.btn-accent{background:var(--accent-soft);border-color:#b9dcff;color:var(--accent-ink)}
+.btn-accent:hover{background:#dff0ff;border-color:#a9d4ff}
+
+/* grid / panel */
+.dash{width:min(1120px,96vw)} .dash__header{margin-bottom:12px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px}
+.panel{border:1px solid var(--border);border-radius:12px;padding:14px;background:#fff}
+
+/* densidad compacta */
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0}
+.row--tight{gap:8px;margin:8px 0}
+.selects{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+.selects--tight{gap:6px;margin:6px 0}
+.selects select{padding:8px 10px;border-radius:10px;border:1px solid var(--border);background:#fff}
+.controls{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 2px}
+.controls--tight{gap:6px;margin:6px 0}
+.controls .btn{padding:8px 10px;border-radius:10px;border:1px solid var(--border);background:var(--surface-2)}
+
+/* barra de formato: obligamos inline, mismos altos */
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:8px 0}
+.toolbar button,.toolbar input[type="color"],.toolbar select{
+  border:1px solid var(--border);background:var(--surface-2);border-radius:8px;
+  padding:6px 10px;height:36px;display:inline-flex !important;align-items:center;justify-content:center;
+  width:auto !important; min-width:auto !important;
+}
+
+/* editor */
+.editor{border:1px solid var(--border);border-radius:12px;padding:12px;min-height:220px}
+
+/* listas */
+.list{display:grid;gap:8px;margin:8px 0}
+.item{border:1px solid var(--border);border-radius:10px;padding:10px;background:var(--surface-2);cursor:pointer}
+.item:hover{filter:brightness(1.02)}
+.badge{display:inline-block;padding:2px 8px;border-radius:999px;background:#eee;margin-left:6px;font-size:.8rem}
+
+/* recursos */
+.res-row{display:grid;grid-template-columns:140px 1fr 1fr auto;gap:8px;align-items:center}
+.res-list{display:grid;gap:8px}
+input[type="file"],input[type="text"],input[type="date"],textarea{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px}
+textarea{min-height:80px}
+
+/* separador */
+hr.sep{border:none;border-top:1px dashed var(--border);margin:10px 0}
+
+/* modal */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;padding:20px}
+.modal__inner{width:min(920px,96vw);max-height:90vh;overflow:auto;background:#fff;border-radius:12px;padding:16px;border:1px solid var(--border)}
+.modal.show{display:flex}
+
+/* caja de controles */
+.controls-box{border:1px solid var(--border);border-radius:12px;padding:10px;background:#fff;margin-top:10px}
+.controls-box legend{color:var(--accent-ink);font-weight:700;padding:0 6px}
+.controls-stack{display:flex;gap:8px;flex-wrap:wrap}
