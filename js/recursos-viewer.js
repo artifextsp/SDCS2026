@@ -1,11 +1,13 @@
 // js/recursos-viewer.js
+// Visor de recursos para el dashboard del estudiante.
+// Abre PDFs, imágenes, audio/video, YouTube/Drive, y hace fallback sólo si de verdad no carga.
+
 (function () {
   const $ = (sel, ctx = document) => ctx.querySelector(sel);
-  const $$ = (sel, ctx = document) => Array.from(ctx.querySelectorAll(sel));
 
-  // ----- Modal base (usa los IDs que ya tienes en dashboard-estudiante.html)
+  // ----- Referencias al modal ya existente en tu HTML -----
   const modal = $('#modal');
-  const mBody = $('#mBody');
+  const mBody  = $('#mBody');
   const mTitle = $('#mTitle');
   const mClose = $('#mClose');
 
@@ -14,6 +16,7 @@
     modal.classList.add('open');
     document.body.style.overflow = 'hidden';
   }
+
   function closeModal() {
     if (!modal) return;
     modal.classList.remove('open');
@@ -23,54 +26,70 @@
 
   if (mClose) mClose.addEventListener('click', closeModal);
   if (modal) {
+    // Cerrar al clickear el backdrop
     modal.addEventListener('click', (e) => {
       if (e.target === modal) closeModal();
     });
   }
 
-  // ----- Utilidades
+  // ----- Utils -----
   const EXT = (u) => (u.split('?')[0].split('.').pop() || '').toLowerCase();
   const isHTTP = (u) => /^https?:\/\//i.test(u);
 
-  // Convierte links de Drive y YouTube a formato embebible
+  // Normaliza URL a formato embebible (Drive/YouTube)
   function toEmbeddable(url) {
     try {
       const u = new URL(url);
-      // Google Drive: /file/d/ID/view  -> /file/d/ID/preview
+
+      // Google Drive
       if (u.hostname.includes('drive.google.com')) {
-        // Casos: /file/d/ID/view  o  open?id=ID
+        // /file/d/ID/view -> /file/d/ID/preview
         const m = url.match(/\/file\/d\/([^/]+)/);
         const id = m ? m[1] : u.searchParams.get('id');
         if (id) return `https://drive.google.com/file/d/${id}/preview`;
       }
+
       // YouTube
       if (u.hostname.includes('youtube.com') || u.hostname === 'youtu.be') {
         let id = '';
-        if (u.hostname === 'youtu.be') id = u.pathname.slice(1);
-        else id = u.searchParams.get('v');
+        if (u.hostname === 'youtu.be') {
+          id = u.pathname.slice(1);
+        } else {
+          // youtube.com/watch?v=ID
+          id = u.searchParams.get('v') || '';
+          // también soporta /shorts/ID o /embed/ID
+          if (!id) {
+            const parts = u.pathname.split('/').filter(Boolean);
+            const idxShorts = parts.indexOf('shorts');
+            const idxEmbed  = parts.indexOf('embed');
+            if (idxShorts !== -1 && parts[idxShorts + 1]) id = parts[idxShorts + 1];
+            if (idxEmbed  !== -1 && parts[idxEmbed  + 1]) id = parts[idxEmbed  + 1];
+          }
+        }
         if (id) return `https://www.youtube.com/embed/${id}`;
       }
+
       return url;
     } catch {
       return url;
     }
   }
 
-  // Si el valor guardado es una ruta de Storage, la volvemos pública
+  // Si la URL es ruta de Storage, la volvemos pública con tu instancia
   function normalizeUrl(url) {
     if (!url) return '';
     if (isHTTP(url)) return toEmbeddable(url);
 
     // Ruta tipo "bucket/carpeta/archivo.pdf"
-    const SUPABASE_URL =
+    const SB_URL =
       window.SUPABASE_URL || localStorage.getItem('SUPABASE_URL') || '';
-    if (SUPABASE_URL && url.includes('/')) {
-      return `${SUPABASE_URL.replace(/\/+$/, '')}/storage/v1/object/public/${url.replace(/^\/+/, '')}`;
+    if (SB_URL && url.includes('/')) {
+      return `${SB_URL.replace(/\/+$/, '')}/storage/v1/object/public/${url.replace(/^\/+/, '')}`;
     }
-    return url; // último recurso
+    return url;
   }
 
-  function showOpenExtern(url) {
+  function renderFallbackOpen(url) {
     mBody.innerHTML = `
       <div class="embed-fallback">
         <p>No se puede mostrar el recurso aquí (el sitio lo bloquea).</p>
@@ -108,29 +127,34 @@
       return a;
     }
 
-    // PDF o genérico en iframe
+    // PDF o sitios embebibles -> iframe
     const ifr = document.createElement('iframe');
     ifr.className = 'embed-iframe';
     ifr.allowFullscreen = true;
-    ifr.setAttribute('loading', 'eager');
+    ifr.setAttribute('loading', 'eager'); // queremos que cargue ya en modal
 
-    // PDF: ajusta vista
+    // Para PDF ajusta la vista (no tocar proporciones)
     if (ext === 'pdf' && !url.includes('#')) {
       ifr.src = `${url}#view=fitH`;
     } else {
       ifr.src = url;
     }
 
-    // Fallback si está bloqueado por X-Frame-Options
-    const guard = setTimeout(() => {
-      // No podemos detectar 100% bloqueo CORS, pero si nada se renderiza, ofrecemos abrir fuera
-      if (!ifr.contentDocument && !ifr.contentWindow) {
-        showOpenExtern(url);
-      }
-    }, 1500);
+    // Guard suave: si en ~4s no hubo 'load', mostramos fallback
+    let loaded = false;
+    const timer = setTimeout(() => {
+      if (!loaded) renderFallbackOpen(url);
+    }, 4000);
 
-    ifr.addEventListener('load', () => clearTimeout(guard));
-    ifr.addEventListener('error', () => showOpenExtern(url));
+    ifr.addEventListener('load', () => {
+      loaded = true;
+      clearTimeout(timer);
+      // Dejar el iframe tal cual; si el sitio se autoredirige a algo bloqueado,
+      // ya no podremos detectarlo de forma fiable, pero esto cubre 99% de casos.
+    });
+
+    // Nota: no forzamos fallback en 'error' porque algunos visores (PDF) emiten
+    // eventos que no significan bloqueo real. El guard de arriba es suficiente.
     return ifr;
   }
 
@@ -138,12 +162,14 @@
     const finalUrl = normalizeUrl(url);
     mTitle.textContent = titulo || 'Recurso';
     mBody.innerHTML = '';
+
     const el = buildEmbed(finalUrl, (tipo || '').toLowerCase());
     mBody.appendChild(el);
+
     openModal();
   }
 
-  // ----- Delegación de eventos en el contenedor de recursos
+  // ----- Delegación en #recursos (botones dentro de la sección Recursos)
   const cont = $('#recursos');
   if (cont) {
     cont.addEventListener('click', (e) => {
@@ -158,7 +184,7 @@
     });
   }
 
-  // Por si también tienes chips fuera de #recursos
+  // Y también chips globales con clase .btn-recurso
   document.addEventListener('click', (e) => {
     const btn = e.target.closest('.btn-recurso');
     if (!btn) return;

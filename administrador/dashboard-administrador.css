@@ -1,0 +1,34 @@
+/* dashboard-administrador.css */
+.card {
+  padding: 40px;
+  width: 60%;
+  margin: 0 auto;
+  background: var(--surface);
+  border-radius: 8px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.buttons-container {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 20px;
+}
+
+button {
+  background-color: #4CAF50;
+  color: white;
+  padding: 15px 32px;
+  font-size: 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #45a049;
+}
+
+button:active {
+  background-color: #3e8e41;
+}
