@@ -1,1 +1,65 @@
-<!doctype html><html lang="es"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>Dashboard Estudiante</title><link rel="stylesheet" href="../base/styles.css"/></head><body><main class="card"><h1 class="h">Dashboard Estudiante</h1><p class="p">(Placeholder)</p></main></body></html>
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dashboard Estudiante – SDCS</title>
+
+  <!-- Nuestro CSS (sin dependencias externas) -->
+  <link rel="stylesheet" href="./estudiante.css?v=7" />
+
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <main class="card card-stu">
+    <header class="head">
+      <h1 class="h h-azul">Dashboard Estudiante</h1>
+      <p class="p">El sistema detecta tu <strong>grado</strong> por el código de acceso. Cambia el <strong>trimestre</strong> a la derecha.</p>
+    </header>
+
+    <!-- Filtros -->
+    <section id="rowTop" class="row row-top">
+      <!-- Oculto por defecto. Solo lo mostramos si pasas ?debug=1 -->
+      <label id="gradoWrap" class="hide">Grado
+        <select id="gradoSel" title="Grado"></select>
+      </label>
+
+      <div class="trimestres" id="trimestres" aria-label="Trimestres">
+        <button data-tri="1" class="chip chip-tri chip-act" title="Trimestre 1">Trimestre 1</button>
+        <button data-tri="2" class="chip chip-tri" title="Trimestre 2">Trimestre 2</button>
+        <button data-tri="3" class="chip chip-tri" title="Trimestre 3">Trimestre 3</button>
+      </div>
+    </section>
+
+    <!-- Tira de chips (QA + Proyecto + Clases) -->
+    <section class="panel">
+      <h2 class="h h-azul-2">Contenido publicado</h2>
+      <div id="chipsRow" class="chips-row">
+        <div class="p">Cargando…</div>
+      </div>
+    </section>
+
+    <!-- Vista de contenido -->
+    <section class="panel">
+      <h2 id="viewTitle" class="h h-azul-2">Vista</h2>
+      <article id="view" class="view"></article>
+      <h3 class="h h-azul-3">Recursos</h3>
+      <div id="recursos" class="recursos"></div>
+    </section>
+  </main>
+
+  <!-- Visor de recursos -->
+  <div id="modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="mTitle">
+    <div class="modal__inner">
+      <div class="modal__bar">
+        <div class="modal__title" id="mTitle"></div>
+        <button id="mClose" class="btn-close" title="Cerrar">Cerrar ✕</button>
+      </div>
+      <div id="mBody" class="modal__body"></div>
+    </div>
+  </div>
+
+  <script type="module" src="../js/estudiante.js?v=7"></script>
+</body>
+</html>
