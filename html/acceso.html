@@ -4,11 +4,18 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Acceso – SDCS</title>
+
+  <!-- Tu CSS actual -->
   <link rel="stylesheet" href="../base/styles.css" />
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- OPCIÓN B (si no hardcodeaste en supabaseClient.js): meta con credenciales -->
+  <!--
+  <meta name="supabase-url"  content="https://TU-PROJECT-REF.supabase.co" />
+  <meta name="supabase-anon" content="TU-ANON-KEY" />
+  -->
 </head>
 <body>
-  <main class="card">
+  <main class="card" style="max-width: 480px; margin: 6rem auto;">
     <h1 class="h">Acceso</h1>
     <p class="p">Ingresa tu <strong>código</strong> de 6 dígitos.</p>
 
@@ -16,37 +23,68 @@
     <input id="codigo" class="input" type="text" inputmode="numeric"
            autocomplete="one-time-code" placeholder="Ej. 902671" maxlength="6" />
 
-    <button id="btn">Entrar</button>
-    <div id="msg" class="msg" style="display:none"></div>
-    <div class="footer">SDCS · Fase 1</div>
+    <button id="btn" class="btn" style="margin-top:1rem">Entrar</button>
+    <div id="msg" class="msg" style="display:none;margin-top:1rem"></div>
+
+    <div class="footer" style="margin-top:2rem;opacity:.7">SDCS · Fase 1</div>
   </main>
 
   <script type="module">
     import { validarAccesoPorCodigo, redirigirSegunPerfil } from '../js/auth.js';
+    import { guardarSesion } from '../js/supabaseClient.js';
+
     const $ = (id) => document.getElementById(id);
-    const btn = $('btn'); const msg = $('msg'); const codigoEl = $('codigo');
 
     function showMsg(text, kind='err'){
+      const msg = $('msg');
       msg.style.display = 'block';
       msg.className = 'msg ' + (kind || '');
       msg.textContent = text;
     }
 
-    btn.addEventListener('click', async () => {
-      showMsg('', ''); btn.disabled = true;
-      const codigo = codigoEl.value.trim();
-      if (!/^\d{6}$/.test(codigo)) { showMsg('El código debe tener 6 dígitos.'); btn.disabled = false; return; }
+    window.addEventListener('DOMContentLoaded', () => {
+      const btn = $('btn');
+      const codigoEl = $('codigo');
 
-      const { data, error } = await validarAccesoPorCodigo(codigo);
-      if (error) { showMsg('Error: ' + (error.message || 'No se pudo validar.')); btn.disabled = false; return; }
-      if (!data) { showMsg('Código no válido.'); btn.disabled = false; return; }
+      if (!btn || !codigoEl) {
+        console.error('No se encontraron #btn o #codigo en el DOM.');
+        return;
+      }
 
-      showMsg('Acceso concedido. Redirigiendo…', 'ok');
-      redirigirSegunPerfil(data.perfil); // COORDINADOR -> dash coordinador; ESTUDIANTE -> dash estudiante
+      const onSubmit = async () => {
+        showMsg('', '');
+        btn.disabled = true;
+
+        const codigo = codigoEl.value.trim();
+        if (!/^\d{6}$/.test(codigo)) {
+          showMsg('El código debe tener 6 dígitos.');
+          btn.disabled = false;
+          return;
+        }
+
+        const { data, error } = await validarAccesoPorCodigo(codigo);
+
+        if (error) {
+          showMsg('Error: ' + (error.message || 'No se pudo validar.'));
+          btn.disabled = false;
+          return;
+        }
+        if (!data) {
+          showMsg('Código no válido.');
+          btn.disabled = false;
+          return;
+        }
+
+        // Guardar sesión ANTES de redirigir
+        guardarSesion({ perfil: data.perfil, grado: data.grado, codigo: data.codigo });
+
+        showMsg('Acceso concedido. Redirigiendo…', 'ok');
+        redirigirSegunPerfil(data.perfil);
+      };
+
+      btn.addEventListener('click', onSubmit);
+      codigoEl.addEventListener('keydown', (e) => { if (e.key === 'Enter') onSubmit(); });
     });
-
-    // Enviar con Enter
-    codigoEl.addEventListener('keydown', (e)=>{ if(e.key==='Enter') btn.click(); });
   </script>
 </body>
 </html>
