@@ -4,18 +4,11 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Acceso – SDCS</title>
-
-  <!-- Tu CSS actual -->
   <link rel="stylesheet" href="../base/styles.css" />
-
-  <!-- OPCIÓN B (si no hardcodeaste en supabaseClient.js): meta con credenciales -->
-  <!--
-  <meta name="supabase-url"  content="https://TU-PROJECT-REF.supabase.co" />
-  <meta name="supabase-anon" content="TU-ANON-KEY" />
-  -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-  <main class="card" style="max-width: 480px; margin: 6rem auto;">
+  <main class="card" style="max-width:520px">
     <h1 class="h">Acceso</h1>
     <p class="p">Ingresa tu <strong>código</strong> de 6 dígitos.</p>
 
@@ -23,68 +16,64 @@
     <input id="codigo" class="input" type="text" inputmode="numeric"
            autocomplete="one-time-code" placeholder="Ej. 902671" maxlength="6" />
 
-    <button id="btn" class="btn" style="margin-top:1rem">Entrar</button>
-    <div id="msg" class="msg" style="display:none;margin-top:1rem"></div>
-
-    <div class="footer" style="margin-top:2rem;opacity:.7">SDCS · Fase 1</div>
+    <button id="btn" class="btn">Entrar</button>
+    <div id="msg" class="msg" style="display:none"></div>
+    <div class="footer">SDCS · Fase 1</div>
   </main>
 
   <script type="module">
-    import { validarAccesoPorCodigo, redirigirSegunPerfil } from '../js/auth.js';
-    import { guardarSesion } from '../js/supabaseClient.js';
+    import { setSupabaseCredentials, initSupabase } from '../js/supabaseClient.js';
+    import { validarAccesoPorCodigo, guardarSesion, redirigirSegunPerfil } from '../js/auth.js';
 
     const $ = (id) => document.getElementById(id);
+    const btn = $('btn'), msg = $('msg'), codigoEl = $('codigo');
+
+    // 0) Limpia posibles credenciales viejas
+    localStorage.removeItem('sb_url');
+    localStorage.removeItem('sb_key');
+
+    // 1) TUS credenciales EXACTAS (sin espacios ni saltos de línea)
+    const URL = "https://trfiejowmfgzudhsdpdx.supabase.co ";  // <-- tu URL
+    const KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRyZmllam93bWZnenVkaHNkcGR4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY0MjM2MjksImV4cCI6MjA3MTk5OTYyOX0.SCNuSO9uKtaKfGBSi3WMIpvNFmsE66aRROJEgTUrx34";             // <-- tu anon key completa
+
+    // 2) Fija credenciales y crea cliente
+    try {
+      setSupabaseCredentials(URL.trim(), KEY.trim());
+      const sb = initSupabase();
+      // Diagnóstico: muestra prefijo/longitud de la key para confirmar que está completa
+      console.log("[SB] URL:", URL);
+      console.log("[SB] KEY len:", KEY.length, "prefix:", KEY.slice(0,10));
+    } catch (e) {
+      console.error(e);
+      showMsg('Error inicializando Supabase: ' + (e?.message || ''));
+    }
 
     function showMsg(text, kind='err'){
-      const msg = $('msg');
       msg.style.display = 'block';
       msg.className = 'msg ' + (kind || '');
       msg.textContent = text;
     }
 
-    window.addEventListener('DOMContentLoaded', () => {
-      const btn = $('btn');
-      const codigoEl = $('codigo');
+    async function intentarAcceso(){
+      showMsg('', ''); btn.disabled = true;
+      const codigo = (codigoEl.value || '').trim();
+      if (!/^\d{6}$/.test(codigo)) { showMsg('El código debe tener 6 dígitos.'); btn.disabled = false; return; }
 
-      if (!btn || !codigoEl) {
-        console.error('No se encontraron #btn o #codigo en el DOM.');
-        return;
-      }
-
-      const onSubmit = async () => {
-        showMsg('', '');
-        btn.disabled = true;
-
-        const codigo = codigoEl.value.trim();
-        if (!/^\d{6}$/.test(codigo)) {
-          showMsg('El código debe tener 6 dígitos.');
-          btn.disabled = false;
-          return;
-        }
-
-        const { data, error } = await validarAccesoPorCodigo(codigo);
-
-        if (error) {
-          showMsg('Error: ' + (error.message || 'No se pudo validar.'));
-          btn.disabled = false;
-          return;
-        }
-        if (!data) {
-          showMsg('Código no válido.');
-          btn.disabled = false;
-          return;
-        }
-
-        // Guardar sesión ANTES de redirigir
-        guardarSesion({ perfil: data.perfil, grado: data.grado, codigo: data.codigo });
-
+      try {
+        const { perfil, grado, codigo: cod } = await validarAccesoPorCodigo(codigo);
+        guardarSesion({ perfil, grado, codigo: cod });
         showMsg('Acceso concedido. Redirigiendo…', 'ok');
-        redirigirSegunPerfil(data.perfil);
-      };
+        redirigirSegunPerfil(perfil);
+      } catch (e) {
+        console.error(e);
+        // Si es 401, o “Invalid API key”, se verá aquí
+        showMsg('Error: ' + (e?.message || 'No se pudo validar.'));
+        btn.disabled = false;
+      }
+    }
 
-      btn.addEventListener('click', onSubmit);
-      codigoEl.addEventListener('keydown', (e) => { if (e.key === 'Enter') onSubmit(); });
-    });
+    btn.addEventListener('click', intentarAcceso);
+    codigoEl.addEventListener('keydown', (e)=>{ if(e.key==='Enter') intentarAcceso(); });
   </script>
 </body>
 </html>

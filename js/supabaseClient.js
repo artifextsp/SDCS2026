@@ -1,65 +1,58 @@
 // js/supabaseClient.js
-// Cliente único de Supabase para todo el front (ESM + CDN v2).
-// ───────────────────────────────────────────────────────────
-import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+// Cliente centralizado de Supabase con compatibilidad hacia atrás.
+// Soporta: setSupabaseCredentials (alias), guardarCredenciales, initSupabase, getSupabase, limpiarCredenciales
 
-// OPCIÓN A: Pon aquí tus credenciales (ENTRE COMILLAS)
-const SUPABASE_URL_HARDCODE  = "https://trfiejowmfgzudhsdpdx.supabase.co"; // ← reemplaza
-const SUPABASE_ANON_HARDCODE = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRyZmllam93bWZnenVkaHNkcGR4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY0MjM2MjksImV4cCI6MjA3MTk5OTYyOX0.SCNuSO9uKtaKfGBSi3WMIpvNFmsE66aRROJEgTUrx34";                          // ← reemplaza
+const LS_URL = 'SB_URL';
+const LS_KEY = 'SB_KEY';
 
-// OPCIÓN B: (alternativa) léelas desde <meta> del HTML
-// <meta name="supabase-url"  content="https://xxx.supabase.co">
-// <meta name="supabase-anon" content="eyJh...">
-const urlMeta  = document.querySelector('meta[name="supabase-url"]')?.content?.trim() || "";
-const anonMeta = document.querySelector('meta[name="supabase-anon"]')?.content?.trim() || "";
+let _client = null;
 
-// Selección final (meta > hardcode)
-const SUPABASE_URL  = urlMeta  || SUPABASE_URL_HARDCODE;
-const SUPABASE_ANON = anonMeta || SUPABASE_ANON_HARDCODE;
-
-// Validación amable (evita ReferenceError)
-if (!SUPABASE_URL || !/^https?:\/\/.*supabase\.co/i.test(SUPABASE_URL)) {
-  throw new Error(
-    "Supabase URL no configurada correctamente. Edita js/supabaseClient.js o añade <meta name='supabase-url' ...>."
-  );
-}
-if (!SUPABASE_ANON || SUPABASE_ANON.length < 20) {
-  throw new Error(
-    "Supabase anon key no configurada. Edita js/supabaseClient.js o añade <meta name='supabase-anon' ...>."
-  );
+function _save(url, key) {
+  if (url) localStorage.setItem(LS_URL, String(url).trim());
+  if (key) localStorage.setItem(LS_KEY, String(key).trim());
+  _client = null; // forzar recreación
 }
 
-// Cliente
-export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON);
+/** API nueva */
+export function guardarCredenciales(url, key) { _save(url, key); }
+/** Compatibilidad con código existente */
+export function setSupabaseCredentials(url, key) { _save(url, key); }
 
-// Helpers de sesión (localStorage)
-const LS = {
-  perfil: "sdcs.perfil",
-  grado:  "sdcs.grado",
-  codigo: "sdcs.codigo",
-};
+/** Devuelve (o crea) el cliente supabase-js v2 */
+export function getSupabase() {
+  if (_client) return _client;
 
-export function guardarSesion({ perfil, grado, codigo }) {
-  if (perfil) localStorage.setItem(LS.perfil, String(perfil));
-  if (Number.isFinite(Number(grado))) localStorage.setItem(LS.grado, String(Number(grado)));
-  if (codigo) localStorage.setItem(LS.codigo, String(codigo));
+  const url = (localStorage.getItem(LS_URL) || '').trim();
+  const key = (localStorage.getItem(LS_KEY) || '').trim();
+
+  if (!window.supabase) {
+    throw new Error('Supabase JS no está cargado. Incluye el CDN en el HTML.');
+  }
+  if (!/^https:\/\/.+\.supabase\.co$/.test(url) || !key) {
+    throw new Error('Faltan credenciales de Supabase. Llama a setSupabaseCredentials(url, key).');
+  }
+
+  // Log mínimo (no imprime la key completa)
+  console.log('[SB] URL:', url);
+  console.log('[SB] KEY len:', key.length, 'prefix:', key.slice(0, 10));
+
+  _client = window.supabase.createClient(url, key);
+  return _client;
 }
 
-export function borrarSesion() {
-  localStorage.removeItem(LS.perfil);
-  localStorage.removeItem(LS.grado);
-  localStorage.removeItem(LS.codigo);
+/** Compatibilidad: algunos módulos llaman initSupabase(url?, key?) */
+export function initSupabase(url, key) {
+  if (url && key) _save(url, key);
+  return getSupabase();
 }
 
-export function getPerfilActual() {
-  return localStorage.getItem(LS.perfil) || null;
+/** Limpia credenciales guardadas */
+export function limpiarCredenciales() {
+  localStorage.removeItem(LS_URL);
+  localStorage.removeItem(LS_KEY);
+  _client = null;
+  console.log('Credenciales de Supabase eliminadas.');
 }
 
-export function getGradoActual() {
-  const g = Number(localStorage.getItem(LS.grado));
-  return Number.isFinite(g) ? g : null;
-}
-
-export function getCodigoActual() {
-  return localStorage.getItem(LS.codigo) || null;
-}
+// Helper de consola para pruebas rápidas
+window.sbSet = (u, k) => { _save(u, k); console.log('Credenciales guardadas.'); };

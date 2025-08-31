@@ -5,22 +5,32 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Dashboard Estudiante – SDCS</title>
 
-  <!-- Nuestro CSS (sin dependencias externas) -->
-  <link rel="stylesheet" href="./estudiante.css?v=7" />
+  <!-- Estilos (ajusta rutas si tu estructura difiere) -->
+  <link rel="stylesheet" href="../base/styles.css?v=10" />
+  <link rel="stylesheet" href="./estudiante.css?v=10" />
 
-  <!-- Supabase -->
+  <!-- Supabase v2 (disponible como window.supabase para supabaseClient.js) -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
+  <noscript>
+    <p style="padding:12px;background:#fee;border:1px solid #f99;max-width:720px;margin:16px auto">
+      Para usar el dashboard necesitas habilitar JavaScript.
+    </p>
+  </noscript>
+
   <main class="card card-stu">
     <header class="head">
       <h1 class="h h-azul">Dashboard Estudiante</h1>
-      <p class="p">El sistema detecta tu <strong>grado</strong> por el código de acceso. Cambia el <strong>trimestre</strong> a la derecha.</p>
+      <p class="p">
+        El sistema detecta tu <strong>grado</strong> por el código de acceso.
+        Cambia el <strong>trimestre</strong> a la derecha.
+      </p>
     </header>
 
     <!-- Filtros -->
     <section id="rowTop" class="row row-top">
-      <!-- Oculto por defecto. Solo lo mostramos si pasas ?debug=1 -->
+      <!-- Oculto por defecto. Se muestra si pasas ?debug=1 o si no hay grado en sesión -->
       <label id="gradoWrap" class="hide">Grado
         <select id="gradoSel" title="Grado"></select>
       </label>
@@ -60,6 +70,7 @@
     </div>
   </div>
 
-  <script type="module" src="../js/estudiante.js?v=7"></script>
+  <!-- Lógica del dashboard -->
+  <script type="module" src="../js/estudiante.js?v=10"></script>
 </body>
 </html>

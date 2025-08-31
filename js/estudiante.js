@@ -1,261 +1,298 @@
 // js/estudiante.js
-// Dashboard Estudiante: SIEMPRE filtra por (grado, trimestre, publicado=true)
+import { getSupabase } from './supabaseClient.js';
 
-import { supabase, getGradoActual } from "../js/supabaseClient.js";
+/* ================= DOM ================= */
+const $  = (q)=>document.querySelector(q);
+const $$ = (q)=>document.querySelectorAll(q);
 
-const ui = {
-  chipsRow:   document.getElementById("chipsRow"),
-  view:       document.getElementById("view"),
-  viewTitle:  document.getElementById("viewTitle"),
-  recursos:   document.getElementById("recursos"),
-  triBtns:    [...document.querySelectorAll(".chip-tri, [data-tri]")], // Trimestre 1/2/3
-  avisoCont:  document.querySelector('[data-aviso="contenido"]') || null, // opcional
-};
+const chipsRow   = $('#chipsRow');
+const view       = $('#view');
+const recursosEl = $('#recursos');
 
-const estado = {
-  grado: null,
-  tri:   1,
-};
+const triWrap    = $('#trimestres');
+const gradoWrap  = $('#gradoWrap');
+const gradoSel   = $('#gradoSel');
 
+const modal      = $('#modal');
+const mTitle     = $('#mTitle');
+const mBody      = $('#mBody');
+const mClose     = $('#mClose');
+
+/* =============== SESIÓN (de Acceso) =============== */
+function getSesion(){
+  try { return JSON.parse(sessionStorage.getItem('sdcs_sesion') || 'null'); }
+  catch { return null; }
+}
+function setSesionGrade(gr){
+  const s = getSesion() || {};
+  s.grado = Number(gr);
+  sessionStorage.setItem('sdcs_sesion', JSON.stringify(s));
+  return s.grado;
+}
+function getGrado(){
+  const s = getSesion();
+  return s?.grado ? Number(s.grado) : null;
+}
+
+/* =============== ESTADO =============== */
+let sb = null;
+let tri = 1;
+let grado = null;
+
+/* =============== INIT =============== */
 init().catch(console.error);
 
-async function init() {
-  // 1) Verifica sesión (grado)
-  const grado = getGradoActual();
-  if (!Number.isFinite(grado)) {
-    // sin sesión → acceso
-    window.location.href = "./acceso.html?e=nosession";
+async function init(){
+  // Supabase
+  try{
+    sb = getSupabase();
+  }catch(e){
+    warn('Supabase: faltan credenciales o la librería supabase-js.');
+    console.error('Error: Supabase no inicializado.', e);
     return;
   }
-  estado.grado = Number(grado);
 
-  // 2) Trimestre UI
-  bindTrimestres();
-
-  // 3) Cargar la tira de chips por primera vez
-  await cargarChips();
-}
-
-// Manejo de trimestres
-function bindTrimestres() {
-  ui.triBtns.forEach((b) => {
-    b.addEventListener("click", async (e) => {
-      const tri = Number(e.currentTarget.dataset.tri || 1);
-      estado.tri = tri;
-      ui.triBtns.forEach(x => x.classList.toggle("chip-act", x === e.currentTarget));
-      await cargarChips();
-    });
+  // Botones de trimestres (arriba derecha)
+  triWrap.addEventListener('click', (ev)=>{
+    const btn = ev.target.closest('[data-tri]');
+    if(!btn) return;
+    tri = Number(btn.dataset.tri || 1);
+    $$('.chip-tri').forEach(b=>b.classList.remove('chip-act'));
+    btn.classList.add('chip-act');
+    cargar();
   });
-}
 
-function setLoading(msg = "Cargando…") {
-  ui.chipsRow.innerHTML = `<div class="p">${msg}</div>`;
-  ui.view.innerHTML = "";
-  ui.recursos.innerHTML = "";
-  ui.viewTitle.textContent = "Vista";
-}
+  // Grado desde sesión o selector si no hay / debug
+  grado = getGrado();
+  const debug = new URLSearchParams(location.search).get('debug') === '1';
 
-// Construye una “chip” (botón)
-function chip(html, attrs = {}) {
-  const btn = document.createElement("button");
-  btn.className = "chip";
-  btn.innerHTML = html;
-  Object.entries(attrs).forEach(([k, v]) => btn.setAttribute(k, v));
-  return btn;
-}
+  // Inyectamos badge "Grado X°" a la izquierda sin tocar el HTML
+  const gradoInfo = document.createElement('div');
+  gradoInfo.id = 'gradoInfo';
+  $('#rowTop').prepend(gradoInfo);
 
-// =================== CARGA DE LISTAS ===================
-
-async function cargarChips() {
-  setLoading();
-
-  const { grado, tri } = estado;
-
-  // Qué vamos a aprender
-  const qaP = supabase
-    .from("que_aprender")
-    .select("id, contenido")
-    .eq("grado", grado)
-    .eq("trimestre", tri)
-    .eq("publicado", true)
-    .order("id", { ascending: false })
-    .limit(1)
-    .throwOnError();
-
-  // Proyecto del trimestre
-  const prP = supabase
-    .from("proyectos")
-    .select("id, nombre, descripcion, fecha_inicio, fecha_final")
-    .eq("grado", grado)
-    .eq("trimestre", tri)
-    .eq("publicado", true)
-    .order("id", { ascending: false })
-    .limit(1)
-    .throwOnError();
-
-  // Clases
-  const clP = supabase
-    .from("clases")
-    .select("id, numero_clase, nombre, descripcion, fecha_ejecucion")
-    .eq("grado", grado)
-    .eq("trimestre", tri)
-    .eq("publicado", true)
-    .order("numero_clase", { ascending: true })
-    .throwOnError();
-
-  const [{ data: qa }, { data: proyecto }, { data: clases }] = await Promise.all([qaP, prP, clP]);
-
-  const frag = document.createDocumentFragment();
-
-  // Chips QA + Proyecto primero
-  if (qa && qa.length) {
-    const btnQA = chip(`🕑 Qué vamos a aprender`, { "data-kind": "qa", "data-id": qa[0].id });
-    btnQA.addEventListener("click", () => verQA(qa[0].id));
-    frag.appendChild(btnQA);
-  }
-  if (proyecto && proyecto.length) {
-    const p = proyecto[0];
-    const btnP = chip(`🧪 Proyecto`, { "data-kind": "proy", "data-id": p.id });
-    btnP.addEventListener("click", () => verProyecto(p.id));
-    frag.appendChild(btnP);
-  }
-
-  // Chips de clases (Clase 1, Clase 2…)
-  if (clases && clases.length) {
-    clases.forEach((c) => {
-      const btn = chip(`Clase ${c.numero_clase}`, {
-        "data-kind": "clase",
-        "data-id": String(c.id),
-        title: `${c.nombre || ""}`.trim(),
-      });
-      btn.addEventListener("click", () => verClase(c.id));
-      frag.appendChild(btn);
+  if(!grado || debug){
+    gradoWrap.classList.remove('hide');
+    gradoSel.innerHTML = '<option value="">Grado…</option>' +
+      Array.from({length:11},(_,i)=>`<option value="${i+1}">${i+1}°</option>`).join('');
+    if(grado) gradoSel.value = String(grado);
+    gradoSel.addEventListener('change', ()=>{
+      const g = Number(gradoSel.value);
+      if(!g) return;
+      setSesionGrade(g);
+      grado = g;
+      updateGradeBadge(gradoInfo, grado);
+      cargar();
     });
+    if(grado){ updateGradeBadge(gradoInfo, grado); await cargar(); }
+  }else{
+    updateGradeBadge(gradoInfo, grado);
+    await cargar();
   }
 
-  ui.chipsRow.innerHTML = "";
-  if (!frag.children.length) {
-    ui.chipsRow.innerHTML = `<div class="p">No hay contenido publicado para este grado y trimestre.</div>`;
-    return;
-  }
-  ui.chipsRow.appendChild(frag);
+  // Modal
+  mClose.addEventListener('click', cerrarModal);
+  modal.addEventListener('click', (e)=>{ if(e.target===modal) cerrarModal(); });
 }
 
-// =================== VISTAS DETALLE ===================
-
-async function verQA(id) {
-  ui.viewTitle.textContent = "Qué vamos a aprender";
-  ui.view.innerHTML = "Cargando…";
-  ui.recursos.innerHTML = "";
-
-  const { data, error } = await supabase
-    .from("que_aprender").select("contenido").eq("id", id).single();
-
-  if (error || !data) {
-    ui.view.innerHTML = `<div class="p">No se pudo cargar el contenido.</div>`;
-    return;
-  }
-  ui.view.innerHTML = sanitizeHtml(data.contenido || "");
+function updateGradeBadge(node, g){
+  node.textContent = `Grado ${g}°`;
 }
 
-async function verProyecto(id) {
-  ui.viewTitle.textContent = "Proyecto del trimestre";
-  ui.view.innerHTML = "Cargando…";
-  ui.recursos.innerHTML = "";
+/* =============== CARGA PRINCIPAL =============== */
+async function cargar(){
+  chipsRow.innerHTML = '<div class="p">Cargando…</div>';
+  view.innerHTML      = '';
+  recursosEl.innerHTML= '';
 
-  const { data, error } = await supabase
-    .from("proyectos")
-    .select("nombre, descripcion, fecha_inicio, fecha_final")
-    .eq("id", id).single();
-
-  if (error || !data) {
-    ui.view.innerHTML = `<div class="p">No se pudo cargar el proyecto.</div>`;
+  if(!grado){
+    msg('Falta el grado del estudiante en la sesión.', 'warn');
     return;
   }
-  const parts = [];
-  parts.push(`<h3 class="h h-azul-3">${escapeHtml(data.nombre || "Proyecto")}</h3>`);
-  if (data.descripcion) parts.push(`<div class="p">${sanitizeHtml(data.descripcion)}</div>`);
-  if (data.fecha_inicio || data.fecha_final) {
-    parts.push(`<div class="p"><small>${fmtFecha(data.fecha_inicio)} – ${fmtFecha(data.fecha_final)}</small></div>`);
+
+  try{
+    const [qa, proyecto, clases] = await Promise.all([
+      qPublicados('que_aprender', grado, tri, { one:true }),
+      qPublicados('proyectos', grado, tri, { one:true }),
+      qPublicados('clases', grado, tri, { order:['numero_clase','asc'] })
+    ]);
+
+    renderChips(qa, proyecto, clases);
+
+    // Vista inicial
+    if(qa)         renderContenido('qa', qa);
+    else if(proyecto) renderContenido('proyecto', proyecto);
+    else if(clases && clases.length) renderContenido('clase', clases[0]);
+    else{
+      chipsRow.innerHTML = '<div class="msg warn">No hay contenido publicado para este grado y trimestre.</div>';
+      view.innerHTML = '';
+      recursosEl.innerHTML = '';
+    }
+  }catch(e){
+    console.error(e);
+    chipsRow.innerHTML = '<div class="msg err">Error al cargar contenido.</div>';
   }
-  ui.view.innerHTML = parts.join("\n");
 }
 
-async function verClase(id) {
-  ui.viewTitle.textContent = "Clase";
-  ui.view.innerHTML = "Cargando…";
-  ui.recursos.innerHTML = "";
+/* =============== CONSULTAS =============== */
+async function qPublicados(tabla, grado, tri, opt={}){
+  const { one=false, order=null } = opt;
 
-  const [cRes, rRes] = await Promise.all([
-    supabase.from("clases")
-      .select("nombre, descripcion, fecha_ejecucion, contenido")
-      .eq("id", id).single(),
-    supabase.from("recursos")
-      .select("id, tipo_recurso, nombre, url, fecha_subida")
-      .eq("clase_id", id)
-      .order("fecha_subida", { ascending: false }),
-  ]);
-
-  const clase = cRes.data;
-  if (cRes.error || !clase) {
-    ui.view.innerHTML = `<div class="p">No se pudo cargar la clase.</div>`;
-    return;
+  // intento con "publicado"
+  try{
+    let q = sb.from(tabla).select('*').eq('grado', grado).eq('trimestre', tri).eq('publicado', true);
+    if(order) q = q.order(order[0], { ascending: order[1] !== 'desc' });
+    if(one)   q = q.limit(1);
+    const { data, error } = await q;
+    if(error) throw error;
+    return one ? (data?.[0] ?? null) : (data ?? []);
+  }catch(_){
+    // intento sin "publicado"
+    let q = sb.from(tabla).select('*').eq('grado', grado).eq('trimestre', tri);
+    if(order) q = q.order(order[0], { ascending: order[1] !== 'desc' });
+    if(one)   q = q.limit(1);
+    const { data, error } = await q;
+    if(error) throw error;
+    return one ? (data?.[0] ?? null) : (data ?? []);
   }
+}
 
-  const parts = [];
-  parts.push(`<h3 class="h h-azul-3">${escapeHtml(clase.nombre || "Clase")}</h3>`);
-  if (clase.descripcion) parts.push(`<div class="p">${sanitizeHtml(clase.descripcion)}</div>`);
-  if (clase.fecha_ejecucion) parts.push(`<div class="p"><small>${fmtFecha(clase.fecha_ejecucion)}</small></div>`);
-  if (clase.contenido) parts.push(`<article class="p">${sanitizeHtml(clase.contenido)}</article>`);
-  ui.view.innerHTML = parts.join("\n");
-
-  // Recursos como tarjeticas
-  const recs = rRes.data || [];
-  if (!recs.length) return;
-
-  const frag = document.createDocumentFragment();
-  recs.forEach((r) => {
-    const card = document.createElement("button");
-    card.className = "chip chip-rec";
-    card.title = r.tipo_recurso || "";
-    card.innerHTML = `${icono(r.tipo_recurso)} ${escapeHtml(r.nombre || "Recurso")}`;
-    card.addEventListener("click", () => abrirRecurso(r));
-    frag.appendChild(card);
+/* =============== RENDER =============== */
+function renderChips(qa, proyecto, clases){
+  const items = [];
+  if(qa)       items.push({ k:'qa',       t:'Qué vamos a aprender', item:qa });
+  if(proyecto) items.push({ k:'proyecto', t:'Proyecto', item:proyecto });
+  (clases||[]).forEach((c,ix)=>{
+    const n = c?.numero_clase ?? (ix+1);
+    items.push({ k:'clase', t:`Clase ${n}`, item:c });
   });
-  ui.recursos.innerHTML = "";
-  ui.recursos.appendChild(frag);
+
+  if(!items.length){
+    chipsRow.innerHTML = '<div class="msg warn">No hay datos disponibles.</div>';
+    return;
+  }
+
+  chipsRow.innerHTML = items.map((it,idx)=>{
+    const tip = buildTooltip(it.item);
+    return `<div class="chip-item" data-k="${it.k}" data-idx="${idx}"
+              title="${escapeHtml(tip).replace(/\n/g,'&#10;')}">${escapeHtml(it.t)}</div>`;
+  }).join('');
+
+  chipsRow.onclick = (e)=>{
+    const el = e.target.closest('.chip-item'); if(!el) return;
+    const k = el.dataset.k, idx = Number(el.dataset.idx);
+    const target = items[idx];
+    renderContenido(k, target.item);
+  };
 }
 
-// =================== Recursos (visor simple) ===================
-
-function abrirRecurso(r) {
-  // Puedes reemplazar con tu modal existente; aquí un fallback simple:
-  const w = window.open("", "_blank", "noopener,noreferrer");
-  if (!w) return;
-  // Para PDFs/Imagen/Audio/Video: el navegador se encarga.
-  w.location.href = r.url;
+function buildTooltip(row){
+  const t = row?.titulo || row?.nombre || '';
+  const d = row?.descripcion || row?.descripcion_corta || row?.detalle || '';
+  const f = row?.fecha || row?.fecha_ejecucion || row?.created_at || row?.updated_at || '';
+  const dShort = String(d||'').trim().slice(0,140) + (d && d.length>140 ? '…' : '');
+  const lines = [];
+  if(t) lines.push(`Título: ${t}`);
+  if(dShort) lines.push(`Descripción: ${dShort}`);
+  if(f) lines.push(`Fecha: ${f}`);
+  return lines.join('\n');
 }
 
-// =================== Utilidades UI ===================
+function renderContenido(tipo, data){
+  recursosEl.innerHTML = '';
 
-function fmtFecha(d) {
-  try { return new Date(d).toLocaleDateString(); } catch { return ""; }
+  const titulo = data?.titulo || data?.nombre || (tipo==='qa'?'Qué vamos a aprender': (tipo==='proyecto'?'Proyecto':'Clase'));
+  const desc   = data?.descripcion || data?.descripcion_corta || data?.detalle || '';
+  const fecha  = data?.fecha || data?.fecha_ejecucion || data?.created_at || data?.updated_at || '';
+
+  view.innerHTML = `
+    <h3>${escapeHtml(String(titulo))}</h3>
+    ${desc ? `<p class="lead">${escapeHtml(String(desc))}</p>` : ''}
+    ${fecha ? `<div class="meta">Fecha: ${escapeHtml(String(fecha))}</div>` : ''}
+    ${data?.contenido || data?.texto ? `<div>${data.contenido || data.texto}</div>` : ''}
+  `;
+
+  const id = data?.id;
+  if(!id){ return; }
+
+  cargarRecursosRelacionado(id, tipo)
+    .then(rs => {
+      if(!rs || rs.length===0){
+        recursosEl.innerHTML = '<div class="msg warn">Sin recursos asociados.</div>';
+        return;
+      }
+      recursosEl.innerHTML = rs.map(r => (
+        `<div class="rec" data-url="${encodeURIComponent(r.url||'')}" data-n="${encodeURIComponent(r.nombre||'Recurso')}" data-t="${encodeURIComponent(r.tipo_recurso||'')}">
+           ${escapeHtml(r.nombre || 'Recurso')}
+         </div>`
+      )).join('');
+
+      recursosEl.onclick = (e)=>{
+        const el = e.target.closest('.rec'); if(!el) return;
+        const url = decodeURIComponent(el.dataset.url||'');
+        const nombre = decodeURIComponent(el.dataset.n||'Recurso');
+        const tipo = decodeURIComponent(el.dataset.t||'');
+        abrirRecurso(nombre, url, tipo);
+      };
+    })
+    .catch(err=>{
+      console.error('Recursos error:', err);
+      recursosEl.innerHTML = '<div class="msg err">Error cargando recursos.</div>';
+    });
 }
 
-// MUY simple; asume que el HTML que guardas en BD es “confiable” (WYSIWYG propio).
-// Si necesitas sanear estricto, usa una lib (DOMPurify). Aquí neutro:
-function sanitizeHtml(html) { return String(html || ""); }
-function escapeHtml(s) {
-  return String(s || "")
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;");
+/* ===== Recursos: prueba múltiples posibles FKs ===== */
+async function cargarRecursosRelacionado(id, tipo){
+  const candidates = [
+    `${tipo}_id`,                // clase_id, proyecto_id, qa_id
+    'clase_id', 'proyecto_id', 'qa_id', 'contenido_id'
+  ];
+
+  for(const col of candidates){
+    try{
+      const { data, error } = await sb.from('recursos').select('*').eq(col, id);
+      if(error) throw error;
+      if(data && data.length) return data;
+    }catch{ /* prueba siguiente columna */ }
+  }
+  // Fallback: recursos por grado/trimestre si existen
+  try{
+    const { data, error } = await sb.from('recursos').select('*').eq('grado', grado).eq('trimestre', tri);
+    if(error) throw error;
+    return data || [];
+  }catch{ return []; }
 }
-function icono(t) {
-  const k = (t || "").toLowerCase();
-  if (k.includes("pdf")) return "📄";
-  if (k.includes("img") || k.includes("ima") || k.includes("image")) return "🖼️";
-  if (k.includes("audio")) return "🎧";
-  if (k.includes("video") || k.includes("yt")) return "▶️";
-  return "🔗";
+
+/* ====== Visor de recursos ====== */
+function abrirRecurso(nombre, url, tipo){
+  mTitle.textContent = nombre || 'Recurso';
+  mBody.innerHTML = renderEmbed(url, tipo);
+  modal.classList.add('modal--open');
 }
+function cerrarModal(){ modal.classList.remove('modal--open'); mBody.innerHTML=''; }
+
+function renderEmbed(url, tipo){
+  const u = String(url||'');
+  const isPdf  = /\.pdf(\?|$)/i.test(u) || tipo==='pdf';
+  const isImg  = /\.(png|jpe?g|gif|webp|svg)(\?|$)/i.test(u) || tipo==='img';
+  const isYt   = /youtube\.com\/watch\?v=|youtu\.be\//i.test(u);
+
+  if(isPdf){
+    return `<iframe src="${u}#view=fitH" allow="fullscreen"></iframe>`;
+  }
+  if(isImg){
+    return `<img src="${u}" alt="">`;
+  }
+  if(isYt){
+    const id = u.match(/(?:v=|youtu\.be\/)([\w-]+)/)?.[1] || '';
+    if(id) return `<iframe src="https://www.youtube.com/embed/${id}" allowfullscreen></iframe>`;
+  }
+  return `<iframe src="${u}" allow="fullscreen"></iframe>`;
+}
+
+/* ====== Utils ====== */
+function msg(text, kind='err'){
+  chipsRow.innerHTML = `<div class="msg ${kind}">${escapeHtml(text)}</div>`;
+}
+function warn(text){ msg(text,'warn'); }
+function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;', "'":'&#39;'}[c])); }

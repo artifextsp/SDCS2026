@@ -1,51 +1,201 @@
-/* Estilo monocromático, minimalista y profesional (escala de grises) */
-:root{
-  --bg:#f6f7f8;
-  --surface:#ffffff;
-  --surface-2:#fafafa;
-  --border:#e5e7eb;
-  --text:#111827;
-  --muted:#6b7280;
-  --accent:#111111;
-  --accent-contrast:#ffffff;
+/* =========================================================
+   SDCS – Estilos generales y dashboard estudiante
+   (archivo completo para reemplazar)
+   ========================================================= */
+
+/* Reset mínimo y tipografía */
+:root {
+  --azul-900: #0b2e6b;
+  --azul-800: #113a85;
+  --azul-700: #1455cc;
+  --azul-600: #1e6bff;
+  --azul-100: #e8f0ff;
+  --gris-900: #0f1115;
+  --gris-800: #1b1e25;
+  --gris-700: #2a2f3a;
+  --gris-400: #a2a8b6;
+  --gris-300: #c7ccda;
+  --gris-200: #e6e9f2;
+  --gris-100: #f5f7fb;
+  --ok: #17b26a;
+  --warn: #f59e0b;
+  --err: #e03a3a;
+  --radius: 14px;
+  --shadow: 0 10px 30px rgba(0,0,0,.12);
 }
-*{box-sizing:border-box}
-html,body{height:100%}
-body{
-  margin:0;
-  font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,Arial;
-  color:var(--text);
-  background:radial-gradient(1000px 600px at 50% -20%,#ffffff,var(--bg));
-  display:grid;place-items:center;padding:24px;
+
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Inter, Arial, sans-serif;
+  color: #1a1f2b;
+  background: var(--gris-100);
 }
-.card{
-  width:min(480px,94vw);
-  background:var(--surface);
-  border:1px solid var(--border);
-  border-radius:16px;
-  padding:28px;
-  box-shadow:0 20px 60px rgba(0,0,0,.06);
+
+/* Tarjeta principal */
+.card {
+  background: #fff;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 28px;
+  max-width: 1080px;
+  margin: 24px auto;
 }
-.h{font-size:1.5rem;margin:0 0 12px;letter-spacing:.2px}
-.p{color:var(--muted);margin:0 0 18px}
-label{display:block;font-size:.95rem;color:var(--muted);margin:12px 0 8px}
-.input{
-  width:100%;appearance:none;padding:13px 14px;border-radius:12px;
-  border:1px solid var(--border);background:#fff;color:var(--text);font-size:1rem;
+
+/* Encabezados */
+.h { margin: 0 0 8px; font-weight: 800; }
+.h-azul   { color: var(--azul-900); font-size: 34px; letter-spacing: .3px; }
+.h-azul-2 { color: var(--azul-800); font-size: 22px; }
+.h-azul-3 { color: var(--azul-700); font-size: 18px; }
+.p { margin: 0 0 14px; color: #444; }
+
+/* Fila superior (filtros) */
+.row-top { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+.hide { display: none; }
+
+/* Chips de trimestre */
+.trimestres { display: flex; gap: 12px; align-items: center; }
+.chip {
+  appearance: none;
+  border: 1px solid var(--azul-100);
+  background: #fff;
+  color: var(--azul-800);
+  padding: 10px 16px;
+  border-radius: 999px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all .15s ease;
+  box-shadow: 0 2px 0 rgba(0,0,0,.03);
 }
-.input:focus{outline:none;border-color:#d1d5db;box-shadow:0 0 0 4px rgba(17,17,17,.06)}
-button{
-  width:100%;margin-top:16px;padding:12px 14px;border-radius:12px;
-  border:1px solid var(--accent);background:var(--accent);color:var(--accent-contrast);
-  font-weight:600;letter-spacing:.2px;cursor:pointer
+.chip:hover { background: var(--azul-100); }
+.chip-act {
+  background: var(--azul-700);
+  border-color: var(--azul-700);
+  color: #fff;
 }
-button:hover{filter:brightness(1.08)}
-button:active{transform:translateY(1px)}
-button[disabled]{opacity:.6;cursor:not-allowed}
-.msg{
-  margin-top:14px;padding:12px 14px;background:var(--surface-2);
-  border:1px solid var(--border);border-left:4px solid #9ca3af;border-radius:12px;color:var(--text)
+
+/* Paneles */
+.panel {
+  background: #fff;
+  border: 1px dashed var(--gris-200);
+  border-radius: var(--radius);
+  padding: 18px;
+  margin: 16px 0;
 }
-.msg.ok{border-left-color:#4b5563}
-.msg.err{border-left-color:#1f2937}
-.footer{margin-top:18px;text-align:center;color:var(--muted);font-size:.9rem}
+
+/* Tira de chips (QA, Proyecto, clases) */
+.chips-row {
+  display: flex; gap: 12px; flex-wrap: wrap; align-items: center;
+  background: #f4f8ff;
+  border: 1px solid var(--azul-100);
+  padding: 14px;
+  border-radius: 12px;
+}
+.chip-cta {
+  background: #fff;
+  color: var(--azul-800);
+  border: 2px solid var(--azul-700);
+}
+.chip-class {
+  background: #fff;
+  color: var(--azul-900);
+  border: 1px solid #d9e6ff;
+}
+.chip-class:hover { background: #eaf1ff; }
+.chip-cta:hover { background: var(--azul-100); }
+
+/* Vista de contenido */
+.view {
+  min-height: 200px;
+  background: #fff;
+  border: 1px solid var(--gris-200);
+  border-radius: 12px;
+  padding: 18px;
+}
+.view .title {
+  margin: 0 0 6px;
+  color: var(--azul-900);
+  font-weight: 800;
+  font-size: 22px;
+}
+.view .meta {
+  color: var(--gris-400);
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+.view .content { line-height: 1.6; }
+
+/* Lista de recursos */
+.recursos { display: flex; gap: 10px; flex-wrap: wrap; padding-top: 8px; }
+.recursos .chip {
+  font-weight: 700;
+  border: 1px solid #e8eefc;
+  background: #fff;
+}
+.recursos .chip:hover { background: #eef4ff; }
+
+/* Helpers / estados */
+.msg {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 8px 12px; border-radius: 10px; font-weight: 600;
+}
+.msg.ok   { background: #e8fbf2; color: #0d8a54; border: 1px solid #c7f4e2; }
+.msg.err  { background: #ffe9ea; color: #a31616; border: 1px solid #ffd2d7; }
+.msg.info { background: #eef4ff; color: var(--azul-900); border: 1px solid #dbe7ff; }
+
+/* =========================================
+   Modal / visor de recursos dentro de la app
+   ========================================= */
+.modal { position: fixed; inset: 0; background: rgba(0,0,0,.55); display: none; z-index: 9999; }
+.modal.open { display: block; }
+.modal__inner {
+  max-width: 1100px; height: 86vh; margin: 4vh auto;
+  background: #fff; border-radius: 12px; display: flex; flex-direction: column;
+  overflow: hidden; box-shadow: 0 12px 40px rgba(0,0,0,.25);
+}
+.modal__bar {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  padding: 10px 14px; background: var(--azul-700); color: #fff;
+}
+.modal__title { font-weight: 700; }
+.btn-close {
+  background: transparent; border: 0; color: #fff; font-weight: 700;
+  cursor: pointer; padding: 6px 10px; border-radius: 8px;
+}
+.btn-close:hover { background: rgba(255,255,255,.12); }
+
+.modal__body { flex: 1; background: var(--gris-900); display: grid; place-items: center; }
+.modal__body img, .modal__body video, .modal__body iframe, .modal__body audio {
+  width: 100%; height: 100%; border: 0;
+}
+.modal__body img, .modal__body video { object-fit: contain; background: var(--gris-900); }
+.modal__body audio { height: 56px; width: min(720px, 100%); }
+
+.embed-fallback { color: #fff; text-align: center; padding: 24px; }
+.embed-fallback .btn-open {
+  display: inline-block; margin-top: 10px; padding: 10px 14px;
+  background: var(--azul-600); color: #fff; border-radius: 10px; text-decoration: none;
+}
+.embed-fallback .btn-open:hover { filter: brightness(1.08); }
+
+/* Inputs (por si se usan en este módulo) */
+label { font-weight: 700; color: #2b3140; display: block; margin: 10px 0 6px; }
+.input, select {
+  appearance: none;
+  width: 100%; background: #fff; border: 1px solid var(--gris-300);
+  border-radius: 10px; padding: 10px 12px; font-size: 16px;
+}
+button {
+  appearance: none; border: 0; border-radius: 10px; padding: 10px 14px; font-weight: 700;
+}
+.btn {
+  background: var(--azul-700); color: #fff; box-shadow: 0 3px 0 rgba(0,0,0,.08); cursor: pointer;
+}
+.btn:hover { filter: brightness(1.05); }
+
+/* Tablas simples dentro de la vista */
+table { border-collapse: collapse; width: 100%; }
+th, td { border: 1px solid var(--gris-200); padding: 8px 10px; text-align: left; }
+th { background: #f9fbff; color: var(--azul-900); }
