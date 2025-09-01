@@ -1,108 +1,80 @@
-/* --- recursos-viewer.css: SOLO estilos del visor/modal --- */
+/* css/recursos-viewer.css
+   Estilos del visor embebido — fuertemente scopeados a #modal
+   para evitar conflictos con otros ".modal" del proyecto. */
 
-#modal {
-  position: fixed;
-  inset: 0;
-  display: none;
-  background: rgba(2,6,23,.48);
-  z-index: 1000;
-  padding: 24px;
+/* Capa oscura */
+#modal{
+  position:fixed; inset:0; display:none;
+  background:rgba(2,6,23,.55); z-index:1000;
+  padding:4vh 3vw;
 }
-#modal.open { display: block; }
+#modal.open{ display:block; }
 
-.modal__inner {
-  height: 100%;
-  max-width: 1200px;
-  margin: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.modal__bar {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
+/* Contenedor del visor */
+#modal .modal__inner{
+  height:92vh; max-width:1200px; margin:0 auto;
+  background:#0b1a33; color:#fff;
+  border-radius:16px; box-shadow:0 12px 40px rgba(0,0,0,.35);
+  display:flex; flex-direction:column; overflow:hidden;
 }
 
-.modal__title {
-  background: #e8efff;
-  color: #0b1f66;
-  border-radius: 999px;
-  padding: 8px 14px;
-  min-width: 240px;
-  text-align: center;
-  font-weight: 700;
-  box-shadow: inset 0 0 0 1px #dbe3ff;
+/* Barra superior */
+#modal .modal__bar{
+  display:flex; align-items:center; gap:12px;
+  padding:10px 12px; background:#082046; color:#fff;
+}
+#modal .modal__title{
+  flex:1; font-weight:700;
+  border-radius:999px; padding:8px 14px;
+  background:#eaf1ff; color:#021a4c; text-align:center;
+}
+#modal #mClose.btn-close{
+  border:0; background:#2f6bff; color:#fff;
+  border-radius:12px; padding:8px 16px; font-weight:700; cursor:pointer;
 }
 
-#mClose.btn-close {
-  margin-left: auto;
-  background: #2563eb;
-  color: #fff;
-  border: none;
-  border-radius: 10px;
-  padding: 8px 14px;
-  font-weight: 700;
-  cursor: pointer;
+/* Cuerpo del visor: ocupa TODO el alto restante, sin padding */
+#modal .modal__body{
+  flex:1 1 auto; overflow:hidden; padding:0;
+  background:#061833; display:flex; align-items:center; justify-content:center;
 }
 
-.modal__body {
-  background: #071633;
-  border-radius: 18px;
-  box-shadow: 0 10px 30px rgba(2,6,23,.10);
-  padding: 16px;
-  height: calc(100% - 48px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: auto;
+/* Lo embebido debe ocupar el 100% del body */
+#modal .modal__body > iframe,
+#modal .modal__body > video,
+#modal .modal__body > img,
+#modal .modal__body > audio{
+  width:100%;
+  height:100% !important;
+  display:block;
+  border:0;
+  border-radius:10px;
 }
 
-.embed-wrap { position: relative; width: 100%; height: 100%; }
-.embed-iframe {
-  width: 100%;
-  height: 72vh;
-  border: 0;
-  display: block;
-  border-radius: 8px;
-  background: #0b1f2e;
+/* Mantener proporciones para imagen/video */
+#modal .modal__body > img,
+#modal .modal__body > video{
+  object-fit:contain;
+  background:#0a1b34;
 }
-.embed-img {
-  max-width: 100%;
-  max-height: 72vh;
-  width: auto;
-  height: auto;
-  object-fit: contain;
-  display: block;
-  margin: auto;
-  border-radius: 8px;
-  background: #0b1f2e;
-}
-.embed-video { width: 100%; max-height: 72vh; border-radius: 8px; background: #000; }
-.embed-audio { width: 100%; }
 
-.embed-fallback {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  gap: 14px;
-  background: linear-gradient(180deg, rgba(6,12,30,.72), rgba(6,12,30,.86));
-  color: #dbeafe;
-  text-align: center;
-  border-radius: 8px;
+/* Fallback cuando un sitio bloquea <iframe> */
+#modal .embed-fallback{
+  display:flex; align-items:center; justify-content:center; flex-direction:column;
+  gap:14px; width:100%; height:100%;
+  color:#dbeafe; text-align:center; padding:16px;
+  background:linear-gradient(180deg, rgba(6,12,30,.72), rgba(6,12,30,.86));
+  border-radius:10px;
 }
-.embed-fallback.hidden { display: none; }
+#modal .embed-fallback .btn-open{
+  background:#1d4ed8; color:#fff; text-decoration:none;
+  padding:10px 14px; border-radius:10px; font-weight:700;
+}
 
-.embed-fallback .btn-open {
-  background: #1d4ed8;
-  color: #fff;
-  text-decoration: none;
-  padding: 10px 14px;
-  border-radius: 10px;
-  font-weight: 700;
+/* Neutraliza posibles reglas antiguas que limiten a 72–80vh */
+#modal .embed-iframe,
+#modal .embed-video,
+#modal .embed-img{
+  height:auto;
+  max-height:none;
 }
