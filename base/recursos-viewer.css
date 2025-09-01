@@ -1,0 +1,108 @@
+/* --- recursos-viewer.css: SOLO estilos del visor/modal --- */
+
+#modal {
+  position: fixed;
+  inset: 0;
+  display: none;
+  background: rgba(2,6,23,.48);
+  z-index: 1000;
+  padding: 24px;
+}
+#modal.open { display: block; }
+
+.modal__inner {
+  height: 100%;
+  max-width: 1200px;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.modal__bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.modal__title {
+  background: #e8efff;
+  color: #0b1f66;
+  border-radius: 999px;
+  padding: 8px 14px;
+  min-width: 240px;
+  text-align: center;
+  font-weight: 700;
+  box-shadow: inset 0 0 0 1px #dbe3ff;
+}
+
+#mClose.btn-close {
+  margin-left: auto;
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 8px 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.modal__body {
+  background: #071633;
+  border-radius: 18px;
+  box-shadow: 0 10px 30px rgba(2,6,23,.10);
+  padding: 16px;
+  height: calc(100% - 48px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: auto;
+}
+
+.embed-wrap { position: relative; width: 100%; height: 100%; }
+.embed-iframe {
+  width: 100%;
+  height: 72vh;
+  border: 0;
+  display: block;
+  border-radius: 8px;
+  background: #0b1f2e;
+}
+.embed-img {
+  max-width: 100%;
+  max-height: 72vh;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  display: block;
+  margin: auto;
+  border-radius: 8px;
+  background: #0b1f2e;
+}
+.embed-video { width: 100%; max-height: 72vh; border-radius: 8px; background: #000; }
+.embed-audio { width: 100%; }
+
+.embed-fallback {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 14px;
+  background: linear-gradient(180deg, rgba(6,12,30,.72), rgba(6,12,30,.86));
+  color: #dbeafe;
+  text-align: center;
+  border-radius: 8px;
+}
+.embed-fallback.hidden { display: none; }
+
+.embed-fallback .btn-open {
+  background: #1d4ed8;
+  color: #fff;
+  text-decoration: none;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-weight: 700;
+}

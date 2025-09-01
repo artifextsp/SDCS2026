@@ -5,20 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Dashboard Estudiante – SDCS</title>
 
-  <!-- Estilos (ajusta rutas si tu estructura difiere) -->
-  <link rel="stylesheet" href="../base/styles.css?v=10" />
-  <link rel="stylesheet" href="./estudiante.css?v=10" />
+  <!-- Estilos base del proyecto -->
+  <link rel="stylesheet" href="../base/styles.css" />
+  <!-- Estilos propios del dashboard de estudiante -->
+  <link rel="stylesheet" href="./estudiante.css" />
+  <!-- Estilos del visor de recursos (nuevo) -->
+  <link rel="stylesheet" href="../base/recursos-viewer.css" />
 
   <!-- Supabase v2 (disponible como window.supabase para supabaseClient.js) -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-  <noscript>
-    <p style="padding:12px;background:#fee;border:1px solid #f99;max-width:720px;margin:16px auto">
-      Para usar el dashboard necesitas habilitar JavaScript.
-    </p>
-  </noscript>
-
   <main class="card card-stu">
     <header class="head">
       <h1 class="h h-azul">Dashboard Estudiante</h1>
@@ -28,13 +25,14 @@
       </p>
     </header>
 
-    <!-- Filtros -->
+    <!-- Fila de controles superiores -->
     <section id="rowTop" class="row row-top">
-      <!-- Oculto por defecto. Se muestra si pasas ?debug=1 o si no hay grado en sesión -->
+      <!-- Selector de grado (se muestra en modo debug o si no hay grado en sesión) -->
       <label id="gradoWrap" class="hide">Grado
         <select id="gradoSel" title="Grado"></select>
       </label>
 
+      <!-- Botones de trimestres -->
       <div class="trimestres" id="trimestres" aria-label="Trimestres">
         <button data-tri="1" class="chip chip-tri chip-act" title="Trimestre 1">Trimestre 1</button>
         <button data-tri="2" class="chip chip-tri" title="Trimestre 2">Trimestre 2</button>
@@ -42,7 +40,7 @@
       </div>
     </section>
 
-    <!-- Tira de chips (QA + Proyecto + Clases) -->
+    <!-- Chips de contenido (Qué vamos a aprender, Proyecto, Clases) -->
     <section class="panel">
       <h2 class="h h-azul-2">Contenido publicado</h2>
       <div id="chipsRow" class="chips-row">
@@ -50,16 +48,17 @@
       </div>
     </section>
 
-    <!-- Vista de contenido -->
+    <!-- Vista del contenido seleccionado + recursos -->
     <section class="panel">
       <h2 id="viewTitle" class="h h-azul-2">Vista</h2>
       <article id="view" class="view"></article>
+
       <h3 class="h h-azul-3">Recursos</h3>
       <div id="recursos" class="recursos"></div>
     </section>
   </main>
 
-  <!-- Visor de recursos -->
+  <!-- Visor de recursos (modal) -->
   <div id="modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="mTitle">
     <div class="modal__inner">
       <div class="modal__bar">
@@ -70,9 +69,9 @@
     </div>
   </div>
 
-  <!-- Lógica del dashboard -->
-  <script type="module" src="../js/estudiante.js?v=10"></script>
+  <!-- Lógica del dashboard (tu script principal) -->
+  <script type="module" src="../js/estudiante.js"></script>
+  <!-- Visor de recursos (nuevo) -->
   <script src="../js/recursos-viewer.js"></script>
-
 </body>
 </html>
