@@ -225,3 +225,225 @@ body{
 .embed-fallback .btn-open:hover {
   filter: brightness(1.05);
 }
+
+/* ===== Viewer de recursos (modal embebido) ===== */
+.modal__body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  /* Altura útil: top bar + paddings del modal restados */
+  max-height: calc(100vh - 220px);
+  overflow: hidden;
+}
+
+/* Imagen: que nunca se deforme ni se salga */
+.embed-img {
+  max-width: 100%;
+  max-height: calc(100vh - 240px);
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 10px;
+  display: block;
+}
+
+/* Vídeo/audio archivo */
+.embed-video,
+.embed-audio {
+  max-width: 100%;
+  width: 100%;
+  border: 0;
+  border-radius: 10px;
+}
+
+/* Iframe (PDF / YouTube / Drive…) ocupa bien alto sin scrolls absurdos */
+.embed-iframe {
+  width: 100%;
+  height: calc(100vh - 260px);
+  border: 0;
+  border-radius: 10px;
+  background: #0c1324; /* ayuda a que la transición se vea limpia */
+}
+
+/* Fallback cuando el sitio bloquea el embed */
+.embed-fallback {
+  display: grid;
+  place-items: center;
+  gap: 14px;
+  text-align: center;
+  padding: 16px;
+  min-height: 240px;
+  background: linear-gradient(180deg, rgba(6,12,30,.72), rgba(6,12,30,.86));
+  color: #dbeafe;
+  border-radius: 10px;
+}
+.embed-fallback .btn-open {
+  display: inline-block;
+  background: #1d4ed8;
+  color: #fff;
+  text-decoration: none;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-weight: 700;
+}
+
+
+/* ===== Modal y recursos (estilos del visor) ===== */
+.modal {
+  position: fixed;
+  inset: 0;
+  display: none;
+  padding: 32px;
+  background: rgba(0, 10, 30, 0.55);
+  z-index: 9999;
+}
+.modal.open { display: block; }
+
+.modal__inner {
+  height: calc(100vh - 64px);
+  max-width: 1200px;
+  margin: 0 auto;
+  background: #0b1a33;
+  border-radius: 14px;
+  box-shadow: 0 12px 40px rgba(0,0,0,.35);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.modal__bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  background: #082046;
+  color: #fff;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.modal__title {
+  flex: 1;
+  font-weight: 700;
+  border-radius: 999px;
+  padding: 8px 14px;
+  background: #eaf1ff;
+  color: #021a4c;
+}
+
+.btn-close {
+  border: 0;
+  background: #2f6bff;
+  color: #fff;
+  border-radius: 12px;
+  padding: 8px 16px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.modal__body {
+  flex: 1;
+  padding: 16px;
+  overflow: auto;
+  background: #061833;
+}
+
+/* Embeds sin distorsión */
+.embed-iframe {
+  width: 100%;
+  height: min(78vh, 960px);
+  border: 0;
+  display: block;
+}
+
+.embed-img {
+  display: block;
+  max-width: 100%;
+  max-height: min(78vh, 960px);
+  width: auto;
+  height: auto;
+  margin: 0 auto;
+  border-radius: 10px;
+  object-fit: contain; /* evita estiramiento */
+  background: #00000020; /* pequeño contraste si hay transparencia */
+}
+
+.embed-video {
+  width: 100%;
+  max-height: min(78vh, 960px);
+  border-radius: 10px;
+  display: block;
+}
+
+.embed-audio { width: 100%; }
+
+/* Fallback X-Frame-Options */
+.embed-fallback {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 14px;
+  height: min(70vh, 720px);
+  padding: 32px;
+  color: #d9e6ff;
+  background: linear-gradient(180deg, rgba(6,12,30,.72), rgba(6,12,30,.86));
+  border-radius: 8px;
+}
+.embed-fallback .btn {
+  background: #1d4ed8;
+  color: #fff;
+  text-decoration: none;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-weight: 700;
+}
+
+
+/* ----- Viewer de recursos (sin distorsión) ----- */
+.embed-img {
+  display: block;
+  max-width: 100%;
+  max-height: calc(100vh - 240px);
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  margin: 0 auto;
+}
+
+.embed-iframe,
+.embed-video {
+  width: 100%;
+  height: calc(100vh - 240px);
+  border: 0;
+}
+
+.embed-audio { width: 100%; }
+
+.embed-fallback {
+  display: flex; align-items: center; justify-content: center;
+  flex-direction: column; gap: 14px; min-height: 40vh;
+  background: linear-gradient(180deg, rgba(6,12,30,.72), rgba(6,12,30,.86));
+  color: #dbeafe; text-align: center; border-radius: 8px; padding: 16px;
+}
+.embed-fallback .btn-open {
+  background: #1d4ed8; color: #fff; text-decoration: none;
+  padding: 10px 14px; border-radius: 10px; font-weight: 700;
+}
+
+
+.embed-img{
+  display:block;
+  max-width:100%;
+  max-height:calc(100vh - 240px);
+  width:auto;
+  height:auto;
+  object-fit:contain;
+  margin:0 auto;
+}
+.embed-iframe,.embed-video{width:100%;height:calc(100vh - 240px);border:0}
+.embed-audio{width:100%}
+.embed-fallback{display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px;min-height:40vh;background:linear-gradient(180deg,rgba(6,12,30,.72),rgba(6,12,30,.86));color:#dbeafe;text-align:center;border-radius:8px;padding:16px}
+.embed-fallback .btn-open{background:#1d4ed8;color:#fff;text-decoration:none;padding:10px 14px;border-radius:10px;font-weight:700}
