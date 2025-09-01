@@ -1,27 +1,27 @@
 <!doctype html>
 <html lang="es">
-
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Dashboard Administrador – SDCS</title>
+  <title>Acceso Administrador – SDCS</title>
   <link rel="stylesheet" href="../base/styles.css" />
+  <link rel="stylesheet" href="./administrador.css" />
+  <!-- Supabase JS v2 (requerido por adminSupabaseClient.js) -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script type="module" src="./dashboard-administrador.js" defer></script>
 </head>
-
 <body>
-  <main class="card">
-    <h1 class="h">Dashboard Administrador</h1>
-    
-    <div class="buttons-container">
-      <button id="btn-clases">Clases</button>
-      <button id="btn-proyectos">Proyectos</button>
-      <button id="btn-que-aprender">Qué Vamos a Aprender</button>
-    </div>
+  <main class="card card-auth">
+    <h1 class="h">Administrador</h1>
+    <p class="p">Ingresa tu <strong>código</strong> de administrador.</p>
 
-    <div id="content"></div>
+    <label for="codigo">Código</label>
+    <input id="codigo" class="input" type="text" inputmode="numeric" placeholder="Ej. 943009" maxlength="6" />
+
+    <button id="btn">Entrar</button>
+    <div id="msg" class="msg" style="display:none"></div>
   </main>
-</body>
 
+  <!-- Lógica de acceso del administrador (importa desde ./adminAuth.js) -->
+  <script type="module" src="./administrador.js"></script>
+</body>
 </html>

@@ -6,6 +6,7 @@
   <title>Dashboard Administrador – SDCS</title>
   <link rel="stylesheet" href="../base/styles.css" />
   <link rel="stylesheet" href="./administrador.css" />
+  <!-- Supabase JS v2 (requerido por adminSupabaseClient.js) -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
@@ -25,7 +26,15 @@
   </main>
 
   <script type="module">
-  import { supabase } from '../js/supabaseClient.js';
+  // --- Guard de sesión (redirige si no hay sesión de admin) ---
+  try {
+    const admin = JSON.parse(sessionStorage.getItem('sdcs_admin_user') || 'null');
+    if (!admin) window.location.href = './administrador.html';
+  } catch (_) { window.location.href = './administrador.html'; }
+
+  // --- Cliente Supabase exclusivo del Administrador ---
+  import { supabase } from './adminSupabaseClient.js';
+
   const $=(s,c=document)=>c.querySelector(s);
   const panel=$('#panel');
 
@@ -360,7 +369,6 @@
       const ins=await supabase.from('proyectos').insert([payload]).select('id');
       if(ins.error){ console.error(ins.error); alert('No se pudo guardar'); return; }
       const proyecto_id=ins.data[0].id;
-      // Intento de persistencia de recursos si existe tabla
       for(const r of prTmp){ await tryInsert('recursos_proyecto',{ proyecto_id, ...r }); }
       alert('Proyecto guardado.');
     };
