@@ -6,8 +6,28 @@
   <title>Dashboard Administrador – SDCS</title>
   <link rel="stylesheet" href="../base/styles.css" />
   <link rel="stylesheet" href="./administrador.css" />
-  <!-- Supabase JS v2 (requerido por adminSupabaseClient.js) -->
+  <!-- Supabase v2 -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    /* realce de selección en listado */
+    .list .item.sel{ outline:2px solid #1d4ed8; border-radius:10px; background:#eef2ff; }
+    .controls-box{ border:1px solid var(--border); border-radius:12px; padding:12px }
+    .controls-stack{ display:flex; flex-wrap:wrap; gap:10px }
+    .btn-ghost{ padding:12px 14px; border:1px solid var(--border); border-radius:12px; background:#fff; cursor:pointer }
+    .btn-accent{ background:#1d4ed8; border-color:#1d4ed8; color:#fff }
+    .sep{ border:none; border-top:1px solid var(--border); margin:16px 0 }
+    .editor{ min-height:220px; border:1px solid var(--border); border-radius:12px; padding:12px; background:#fff }
+    .toolbar{ display:flex; gap:8px; flex-wrap:wrap; margin:10px 0 }
+    .res-row{ display:grid; grid-template-columns: 140px 1fr 1fr 1fr; gap:10px; align-items:center }
+    .res-list .item{ padding:8px 10px; border:1px solid var(--border); border-radius:10px; background:#fff }
+    .modal{ position:fixed; inset:0; display:none; place-items:center; background:rgba(0,0,0,.4) }
+    .modal.show{ display:grid }
+    .modal__inner{ width:min(960px,94vw); height:min(80vh,90vh); background:#fff; border-radius:14px; padding:18px; overflow:auto }
+    .grid3{ display:grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap:12px }
+    .selects{ display:flex; gap:12px; align-items:end; flex-wrap:wrap; margin:10px 0 }
+    .row{ display:grid; grid-template-columns: 1fr 1fr; gap:12px }
+    @media (max-width:720px){ .row{grid-template-columns:1fr} .res-row{grid-template-columns:1fr} }
+  </style>
 </head>
 <body>
   <main class="card dash card-dash">
@@ -26,13 +46,13 @@
   </main>
 
   <script type="module">
-  // --- Guard de sesión (redirige si no hay sesión de admin) ---
+  // --- Guard de sesión: si no hay admin en sessionStorage, vuelve al login ---
   try {
     const admin = JSON.parse(sessionStorage.getItem('sdcs_admin_user') || 'null');
     if (!admin) window.location.href = './administrador.html';
   } catch (_) { window.location.href = './administrador.html'; }
 
-  // --- Cliente Supabase exclusivo del Administrador ---
+  // --- Cliente Supabase exclusivo del Admin ---
   import { supabase } from './adminSupabaseClient.js';
 
   const $=(s,c=document)=>c.querySelector(s);
@@ -46,9 +66,7 @@
   $('#btn-proy').addEventListener('click',uiProyecto);
   $('#btn-qa').addEventListener('click',uiQueAprender);
 
-  /* =========================================================
-     HELPERS
-  ==========================================================*/
+  /* ============================== HELPERS ============================== */
   function esc(s=''){return s.replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));}
   async function uploadToStorage(grado,tipo,file){
     const bucket=String(grado), folder=FOLDERS[tipo]||'misc';
@@ -64,9 +82,7 @@
     }catch(e){ console.warn(`No se pudo insertar en ${tabla}:`, e?.message||e); }
   }
 
-  /* =========================================================
-     CLASES
-  ==========================================================*/
+  /* =============================== CLASES ============================== */
   function uiClases(){
     panel.innerHTML=`
       <h2 class="h">📚 Clases</h2>
@@ -119,7 +135,7 @@
       if(!clases.length){ listaEl.innerHTML='<div class="p">No hay clases creadas.</div>'; return; }
       listaEl.innerHTML = `<div class="list">
         ${clases.map(c=>`<div class="item" data-id="${c.id}">
-            <strong>Clase ${c.numero_clase}</strong> · ${c.nombre}
+            <strong>Clase ${c.numero_clase}</strong> · ${esc(c.nombre)}
             ${c.descripcion?`<span class="badge">${esc(c.descripcion)}</span>`:''}
             ${c.publicado?'<span class="badge">PUBLICADA</span>':''}
         </div>`).join('')}
@@ -276,31 +292,75 @@
         modal.classList.add('show');
       };
       modal.onclick=(e)=>{ if(e.target===modal) modal.classList.remove('show'); };
-    }
+    } // buildEditorUI
 
+    // === Listar ===
     btnListar.addEventListener('click',cargarListado);
 
+    // === Diseñar ===
     btnDis.addEventListener('click', async ()=>{
       const grado=parseInt($('#gradoSel').value,10), tri=parseInt($('#triSel').value,10);
       const numero=await (async(g,t)=>{ const r=await supabase.from('clases').select('numero_clase').eq('grado',g).eq('trimestre',t).order('numero_clase',{ascending:false}).limit(1); return r.error||!r.data?.length?1:(r.data[0].numero_clase||0)+1; })(grado,tri);
       $('#info').innerHTML=`Creando <strong>Clase ${numero}</strong> para <strong>${grado}°</strong>, trimestre <strong>${tri}</strong>.`;
       buildEditorUI({ grado, tri, clase:{ numero_clase:numero, nombre:`Clase ${numero}` } });
+      // Eliminar deshabilitado hasta seleccionar/crear algo
+      btnDel.disabled = true;
     });
 
+    // === Seleccionar de la lista para Editar / Eliminar ===
     $('#lista').addEventListener('click', async (e)=>{
       const item=e.target.closest('.item'); if(!item) return;
+      // marcar selección visual
+      $('#lista .item.sel')?.classList.remove('sel');
+      item.classList.add('sel');
+
       const id=Number(item.dataset.id);
       const l=await supabase.from('clases').select('*').eq('id',id).single();
       const rs=await supabase.from('recursos').select('*').eq('clase_id',id);
       const grado=parseInt($('#gradoSel').value,10), tri=parseInt($('#triSel').value,10);
-      recursosDB=rs.data||[]; buildEditorUI({ grado, tri, clase:l.data });
-      $('#info').innerHTML=`Editando <strong>Clase ${l.data.numero_clase}</strong>.`;
-    });
-  }
 
-  /* =========================================================
-     PROYECTO (con recursos)
-  ==========================================================*/
+      claseAct=l.data || null;             // <<< clave para eliminar
+      recursosDB=rs.data||[];
+      buildEditorUI({ grado, tri, clase:claseAct });
+      $('#info').innerHTML=`Editando <strong>Clase ${claseAct.numero_clase}</strong>.`;
+
+      // Habilitar acciones
+      btnEdit.disabled=false; btnDel.disabled=false; btnPrev.disabled=false;
+    });
+
+    // === Eliminar clase seleccionada ===
+    btnDel.addEventListener('click', async ()=>{
+      if(!claseAct?.id){ alert('Primero selecciona una clase de la lista.'); return; }
+      const confirmMsg = `¿Eliminar definitivamente la Clase ${claseAct.numero_clase}: "${claseAct.nombre}"?\nSe borrarán también sus recursos.`;
+      if(!confirm(confirmMsg)) return;
+
+      // 1) Borrar recursos vinculados (si la tabla existe / tiene RLS de delete)
+      const delRec = await supabase.from('recursos').delete().eq('clase_id', claseAct.id);
+      if(delRec.error && delRec.error.code !== 'PGRST116'){ // PGRST116 = table not found (por si no existe)
+        console.warn('Error borrando recursos:', delRec.error);
+        alert('No se pudieron borrar los recursos (revisa políticas RLS).');
+        return;
+      }
+      // 2) Borrar la clase
+      const delClase = await supabase.from('clases').delete().eq('id', claseAct.id);
+      if(delClase.error){
+        console.error(delClase.error);
+        alert('No se pudo eliminar la clase (revisa políticas RLS).');
+        return;
+      }
+
+      // Limpieza de UI
+      editorWrap.style.display='none';
+      $('#modal').classList.remove('show');
+      claseAct=null; recursosDB=[]; recursosTmp=[];
+      await cargarListado();
+      $('#info').innerHTML=`<strong>Clase eliminada.</strong>`;
+      btnDel.disabled=true; btnEdit.disabled=true; btnPrev.disabled=true;
+      alert('Clase eliminada correctamente.');
+    });
+  } // uiClases
+
+  /* =============================== PROYECTO ============================= */
   function uiProyecto(){
     panel.innerHTML=`
       <h2 class="h">🧩 Proyecto</h2>
@@ -386,9 +446,7 @@
     };
   }
 
-  /* =========================================================
-     QUÉ VAMOS A APRENDER (con recursos)
-  ==========================================================*/
+  /* ======================== QUÉ VAMOS A APRENDER ======================= */
   function uiQueAprender(){
     panel.innerHTML=`
       <h2 class="h">🧭 Qué vamos a aprender</h2>
