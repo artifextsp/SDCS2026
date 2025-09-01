@@ -269,3 +269,115 @@ body{
   .chips-row .chip-item:nth-of-type(2){ min-width: 100% }
   .trimestres{ width:100%; justify-content:flex-start }
 }
+
+
+/* ===== Intensifica QA/Proyecto (naranja) ===== */
+.chips-row .chip-item.qa,
+.chips-row .chip-item.proyecto,
+.chips-row .chip-item[data-tipo="qa"],
+.chips-row .chip-item[data-tipo="proyecto"]{
+  background: linear-gradient(180deg,#ff7a18 0%, #ff5c00 100%);
+  color:#fff;
+  border-color: transparent;
+  box-shadow: 0 6px 14px rgba(255,92,0,.18);
+}
+.chips-row .chip-item.qa:hover,
+.chips-row .chip-item.proyecto:hover,
+.chips-row .chip-item[data-tipo="qa"]:hover,
+.chips-row .chip-item[data-tipo="proyecto"]:hover{
+  filter: brightness(1.05);
+  transform: translateY(-2px);
+}
+
+/* ===== Clases más pequeñas (azul intenso) ===== */
+.chips-row { gap: 10px; } /* un pelín menos de separación */
+.chips-row .chip-item.clase,
+.chips-row .chip-item[data-tipo="clase"]{
+  background:#1d4ed8;
+  color:#fff;
+  border-color: transparent;
+  padding: 8px 14px;        /* menos alto/ancho */
+  font-size: .95rem;        /* tipografía más compacta */
+  min-width: 140px;         /* ya no necesitan ser tan anchos */
+  border-radius: 12px;
+  box-shadow: 0 6px 14px rgba(29,78,216,.18);
+}
+.chips-row .chip-item.clase:hover,
+.chips-row .chip-item[data-tipo="clase"]:hover{
+  background:#1742c5;
+  transform: translateY(-2px);
+}
+
+/* ===== Recursos: que se vean como BOTONES reales ===== */
+.recursos{ gap: 14px; }
+.rec{
+  background:#1d4ed8;                  /* azul del trimestre: coherencia visual */
+  color:#fff;
+  border: 1px solid #163dbd;
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  text-decoration: none;
+  box-shadow: 0 6px 14px rgba(29,78,216,.18);
+  display: inline-flex; align-items:center; justify-content:center;
+}
+.rec:hover{
+  background:#1742c5;
+  box-shadow: 0 10px 20px rgba(23,66,197,.25);
+  transform: translateY(-2px);
+}
+.rec::after{
+  content:"↗";
+  margin-left:.55rem;
+  font-weight:800;
+  opacity:.85;
+}
+
+
+/* ===== Ajustes finos solicitados ===== */
+
+/* 1) Badge de grado más grande */
+#gradoInfo{
+  font-size: 1.05rem;
+  padding: 10px 14px;
+  border-radius: 14px;
+}
+
+/* 2) “Qué vamos a aprender” y “Proyecto” con naranja más intenso
+   (funciona por orden 1–2 ó por clase .is-orange si la tienes) */
+.chips-row .chip-item:nth-of-type(1),
+.chips-row .chip-item:nth-of-type(2),
+.chip-item.is-orange{
+  background: #f97316;   /* naranja vivo */
+  border-color: transparent;
+  color: #fff;
+}
+.chips-row .chip-item:nth-of-type(1):hover,
+.chips-row .chip-item:nth-of-type(2):hover,
+.chip-item.is-orange:hover{
+  background: #ea580c;   /* un tono más oscuro al hover */
+}
+
+/* 3) Clases con el mismo azul de Trimestres y un tamaño más compacto
+   (aplica a los botones desde el 3ro en adelante o a .is-blue/.is-sm si las usas) */
+.chips-row .chip-item:nth-of-type(n+3),
+.chip-item.is-blue{
+  background: var(--azul);
+  border-color: transparent;
+  color:#fff;
+}
+.chips-row .chip-item:nth-of-type(n+3):hover,
+.chip-item.is-blue:hover{
+  background: var(--azul-2);
+}
+
+/* tamaño más compacto para clases */
+.chips-row .chip-item:nth-of-type(n+3),
+.chip-item.is-blue,
+.chip-item.is-sm{
+  padding: 10px 16px;     /* menos alto */
+  min-width: 170px;       /* no tan anchos */
+  font-weight: 700;
+  font-size: 0.98rem;
+}
