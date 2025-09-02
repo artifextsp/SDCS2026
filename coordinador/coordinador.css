@@ -1,125 +1,262 @@
 /* ===========================
-   Tema Coordinación SDCS v4.1
-   (Ajuste tarjetas + botones azules + visor de recursos)
+   Tema Coordinación SDCS v4.2
+   – KPI compactas (sin solape)
+   – Botones azules
+   – Visor de recursos embebido
+   – Campos Título/Descripción en lista
    =========================== */
 
 :root{
-  --brand-blue:   #1d4ed8;
-  --brand-orange: #f97316;
-  --bg:    #f8fafc;
-  --text:  #0f172a;
-  --muted: #64748b;
+  --brand-blue:#1d4ed8;
+  --brand-orange:#f97316;
+  --bg:#f8fafc;
+  --text:#0f172a;
+  --muted:#64748b;
   --border:#e5e7eb;
-  --card:  #ffffff;
-  --shadow: 0 8px 24px rgba(2,6,23,.06);
+  --card:#ffffff;
+  --shadow:0 8px 24px rgba(2,6,23,.06);
 }
 
-html,body{ height:100%; }
-body{ background:var(--bg); color:var(--text); }
+html,body{height:100%}
+body{background:var(--bg);color:var(--text)}
 
-/* ====== Layout a pantalla completa ====== */
+/* ===== Layout a pantalla completa ===== */
 .card.card-dash{
-  width:100%; max-width:none !important; margin:0; border-radius:0; border:0;
-  box-shadow:none; background:transparent;
-  padding: clamp(16px, 2.8vw, 40px); min-height:100vh;
+  width:100%;max-width:none!important;margin:0;border-radius:0;border:0;
+  box-shadow:none;background:transparent;
+  padding:clamp(16px,2.8vw,40px);min-height:100vh;
 }
 
 /* Header */
 .dash__header{
-  display:grid; grid-template-columns: 1.3fr 1fr; gap: clamp(12px,2vw,28px);
-  align-items:end; margin: 0 0 18px;
+  display:grid;grid-template-columns:1.2fr 1fr;gap:clamp(12px,2vw,28px);
+  align-items:end;margin:0 0 16px;
 }
-.dash__left .h{ margin:0 0 6px; font-size: clamp(22px, 2.6vw, 34px); }
-.dash__left .p{ margin:0; color: var(--muted); }
-.selects{ display:flex; gap:10px; flex-wrap:wrap; align-items:end; }
-.selects label{ display:flex; gap:8px; align-items:center; color:var(--muted) }
-.search{ display:flex; gap:10px; margin-top:8px }
+.dash__left .h{margin:0 0 6px;font-size:clamp(22px,2.6vw,34px)}
+.dash__left .p{margin:0;color:var(--muted)}
+.selects{display:flex;gap:10px;flex-wrap:wrap;align-items:end}
+.selects label{display:flex;gap:8px;align-items:center;color:var(--muted)}
+.search{display:flex;gap:10px;margin-top:8px}
 
 /* Inputs */
-select, input[type="search"], input[type="text"], input[type="date"]{
-  padding:10px 12px; border:1px solid var(--border); border-radius:12px; background:#fff; outline:0;
+select,input[type="search"],input[type="text"],input[type="date"]{
+  padding:10px 12px;border:1px solid var(--border);border-radius:12px;background:#fff;outline:0;
 }
 
-/* ====== Botones (TODOS azules) ====== */
-.btn, .btn-ghost{
-  padding:12px 16px; border-radius:12px; border:1px solid var(--brand-blue);
-  background:var(--brand-blue); color:#fff; cursor:pointer;
-  transition: transform .05s ease, box-shadow .15s ease, filter .15s ease;
+/* ===== Botones azules globales ===== */
+.btn,.btn-ghost{
+  padding:12px 16px;border-radius:12px;border:1px solid var(--brand-blue);
+  background:var(--brand-blue);color:#fff;cursor:pointer;
+  transition:transform .05s ease,box-shadow .15s ease,filter .15s ease;
 }
-.btn:hover, .btn-ghost:hover{ box-shadow: var(--shadow); filter:brightness(.96); }
-.btn:active, .btn-ghost:active{ transform: translateY(1px); }
-.btn-accent{ background:var(--brand-blue); border-color:var(--brand-blue); color:#fff; }
+.btn:hover,.btn-ghost:hover{box-shadow:var(--shadow);filter:brightness(.96)}
+.btn:active,.btn-ghost:active{transform:translateY(1px)}
+.btn-accent{background:var(--brand-blue);border-color:var(--brand-blue);color:#fff}
 
-/* ====== Badges ====== */
-.badge{ background:#eef2ff; color:var(--brand-blue); border:1px solid #c7d2fe; padding:2px 8px; border-radius:999px; font-size:12px }
-.badge--draft{ background:#fee2e2; color:#991b1b; border-color:#fecaca }
+/* ===== Badges ===== */
+.badge{background:#eef2ff;color:var(--brand-blue);border:1px solid #c7d2fe;padding:2px 8px;border-radius:999px;font-size:12px}
+.badge--draft{background:#fee2e2;color:#991b1b;border-color:#fecaca}
 
-/* ====== Tarjetas KPI (más compactas, sin superposición) ====== */
+/* ===== KPI compactas (sin solape) ===== */
 .grid3{
-  display:grid; grid-template-columns: repeat(3, minmax(0,1fr));
-  gap: clamp(10px,1.6vw,18px); margin: 10px 0 18px;
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:clamp(10px,1.6vw,18px);margin:10px 0 14px;
 }
-@media (max-width: 1200px){ .grid3{ grid-template-columns: repeat(2, minmax(0,1fr)); } }
-@media (max-width: 720px){  .grid3{ grid-template-columns: 1fr; } }
+@media (max-width:1200px){.grid3{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:720px){.grid3{grid-template-columns:1fr}}
 
 .kpi{
-  background: var(--card); border:1px solid var(--border); border-radius:16px;
-  box-shadow: var(--shadow); padding:12px; /* ↓ más compacto */
+  background:var(--card);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);
+  padding:10px 12px;display:grid;grid-template-rows:auto auto auto;row-gap:6px;min-height:0;
 }
-.kpi__head{ font-weight:700; color:var(--muted); margin-bottom:4px }
+.kpi__head{font-weight:700;color:var(--muted);margin:0}
 .kpi__num{
-  display:inline-block; font-size: clamp(22px, 2.8vw, 32px); font-weight:800;
-  background: linear-gradient(90deg, var(--brand-blue), var(--brand-orange));
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  display:inline-block;font-size:clamp(20px,2.2vw,28px);font-weight:800;
+  background:linear-gradient(90deg,var(--brand-blue),var(--brand-orange));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
 }
-.kpi__body{ margin:0; padding:0; background:transparent; border:0; height:auto } /* neutraliza estilos extra */
-.kpi__foot{ margin-top:6px }
+.kpi__body{margin:0;padding:0;min-height:0;height:auto;background:transparent;border:0}
+.kpi__foot .btn-ghost{width:100%;padding:10px}
 
-/* ====== Panel de contenido ====== */
-.panel{ display:block; }
-.section{ margin:16px 0; }
-.section__head{ display:flex; align-items:center; justify-content:space-between; gap:12px; }
-.section__head .h{ margin:0; font-size: clamp(18px,2vw,24px); }
+/* ===== Panel / Lista ===== */
+.panel{display:block}
+.section{margin:14px 0}
+.section__head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.section__head .h{margin:0;font-size:clamp(18px,2vw,24px)}
 
-.list{ display:grid; grid-template-columns: 1fr; gap:12px; margin-top:12px }
+.list{display:grid;grid-template-columns:1fr;gap:10px;margin-top:10px}
 .item{
-  display:flex; align-items:center; justify-content:space-between; gap:12px;
-  background:#fff; border:1px solid var(--border); border-radius:14px; padding:12px 14px; box-shadow: var(--shadow);
+  display:flex;align-items:flex-start;justify-content:space-between;gap:12px;
+  background:#fff;border:1px solid var(--border);border-radius:14px;padding:12px 14px;box-shadow:var(--shadow);
 }
-.item__meta{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
-.item__title{ font-weight:700 }
-.item__desc{ color:var(--muted) }
-.item__actions{ display:flex; gap:8px }
+.item__meta{display:flex;flex-direction:column;gap:6px;min-width:0}
+.item__title{font-weight:700}
+.item__desc{color:var(--muted)}
+.item__actions{display:flex;gap:8px;align-items:center}
 
-/* ====== Modal ====== */
-.modal{ position:fixed; inset:0; display:none; place-items:center; background: rgba(2,6,23,.55); z-index:50; }
-.modal.show{ display:grid }
+/* Campos (Título / Descripción) */
+.item__fields{display:grid;gap:4px}
+.field{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.field__label{font-weight:600;color:var(--muted)}
+.field__value{color:var(--text)}
+
+/* ===== Modal / Visor de recursos ===== */
+.modal{position:fixed;inset:0;display:none;place-items:center;background:rgba(2,6,23,.55);z-index:50}
+.modal.show{display:grid}
 .modal__inner{
-  width:min(1080px, 96vw); height:min(86vh, 92vh);
-  background:#fff; border-radius:18px; padding:18px; overflow:auto; box-shadow: 0 16px 48px rgba(2,6,23,.25);
+  width:min(1080px,96vw);height:min(86vh,92vh);background:#fff;border-radius:18px;padding:18px;
+  overflow:auto;box-shadow:0 16px 48px rgba(2,6,23,.25)
 }
-.modal__head{ display:flex; align-items:center; justify-content:space-between; gap:8px; border-bottom:1px solid var(--border); padding-bottom:10px; margin-bottom:12px }
-.modal__body{ line-height:1.55 }
+.modal__head{display:flex;align-items:center;justify-content:space-between;gap:8px;border-bottom:1px solid var(--border);padding-bottom:10px;margin-bottom:12px}
+.modal__body{line-height:1.55}
 
-/* ====== Visor de recursos ====== */
-.res-wrap{ display:grid; grid-template-columns: 280px 1fr; gap:12px; align-items:start; margin-top:12px }
-.res-list{ display:grid; gap:8px }
+/* Visor */
+.res-wrap{display:grid;grid-template-columns:280px 1fr;gap:12px;align-items:start;margin-top:12px}
+.res-list{display:grid;gap:8px}
 .res-item{
-  display:flex; justify-content:space-between; align-items:center; gap:10px;
-  padding:8px 10px; border:1px solid var(--border); border-radius:12px; cursor:pointer; background:#fff;
+  display:flex;justify-content:space-between;align-items:center;gap:10px;
+  padding:8px 10px;border:1px solid var(--border);border-radius:12px;cursor:pointer;background:#fff
 }
-.res-item:hover{ box-shadow: var(--shadow); }
+.res-item:hover{box-shadow:var(--shadow)}
 .viewer{
-  border:1px solid var(--border); border-radius:12px; min-height:320px; height:60vh; background:#0001; overflow:hidden;
-  display:flex; align-items:center; justify-content:center;
+  border:1px solid var(--border);border-radius:12px;min-height:320px;height:60vh;background:#0001;overflow:hidden;
+  display:flex;align-items:center;justify-content:center
 }
-.viewer > iframe, .viewer > video, .viewer > img, .viewer > audio{ width:100%; height:100%; border:0; object-fit:contain }
-.viewer > audio{ height:auto; background:#fff; padding:8px }
-.viewer__hint{ color:var(--muted); font-size:14px }
+.viewer>iframe,.viewer>video,.viewer>img,.viewer>audio{width:100%;height:100%;border:0;object-fit:contain}
+.viewer>audio{height:auto;background:#fff;padding:8px}
+.viewer__hint{color:var(--muted);font-size:14px}
 
-/* ====== Responsive ====== */
-@media (max-width: 1024px){
-  .dash__header{ grid-template-columns: 1fr; }
-  .search{ margin-top: 6px; }
-  .res-wrap{ grid-template-columns: 1fr; }
+/* ===== Responsive ===== */
+@media (max-width:1024px){
+  .dash__header{grid-template-columns:1fr}
+  .search{margin-top:6px}
+  .res-wrap{grid-template-columns:1fr}
+}
+/* ==== Ajuste final KPI: compactas y sin solape ==== */
+.kpi{
+  padding: 8px 10px;
+  grid-template-rows: auto auto;   /* 2 filas: título/numero + botón */
+  min-height: 0;
+  position: relative;
+}
+
+/* La “banda” bajo el número (cualquier relleno) fuera */
+.kpi__body{ display: none !important; }
+
+/* Número un poco más pequeño */
+.kpi__num{ font-size: clamp(18px, 2vw, 24px); }
+
+/* Botón de detalle realmente pequeño */
+.kpi__foot{ margin-top: 4px; }
+.kpi__foot .btn-ghost{
+  width: 100%;
+  padding: 8px 10px;
+  font-size: 14px;
+  border-radius: 10px;
+  line-height: 1.1;
+}
+
+/* Compacta la grilla y el margen inferior para que no “pisen” el contenido */
+.grid3{ gap: 12px; margin: 8px 0 8px; }
+
+/* === KPI compactas y angostas (sin solape) === */
+
+/* 1) Grid de KPI con tarjetas de ancho fijo chico */
+.grid3{
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 260px)); /* cada tarjeta ~260px */
+  justify-content: start;   /* alinea a la izquierda; deja espacio libre a la derecha */
+  gap: 12px;
+  margin: 8px 0 8px;
+}
+
+/* 2) Tarjeta: compacta y sin desbordes */
+.kpi{
+  padding: 8px 10px;
+  overflow: hidden;         /* evita que el botón se “asome” */
+  border-radius: 14px;
+  min-height: 0;
+}
+
+/* quita franja intermedia bajo el número */
+.kpi__body{ display: none !important; }
+
+/* número un poco más chico */
+.kpi__num{ font-size: clamp(18px, 2vw, 24px); }
+
+/* 3) Botón angosto tipo pill y contenido a la derecha, sin ocupar todo el ancho */
+.kpi__foot{
+  margin-top: 6px;
+  display: flex;
+  justify-content: flex-end;
+}
+.kpi__foot .btn-ghost{
+  width: auto;              /* ya no 100% */
+  padding: 6px 12px;
+  font-size: 13px;
+  line-height: 1.1;
+  border-radius: 999px;
+}
+/* ====== KPI COMPACTAS (barra corta, sin solape) ====== */
+
+/* Contenedor: fila con wrap */
+.grid3{
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px;
+  margin:8px 0;
+  align-items:flex-start;
+}
+
+/* Reseteo anti-solape heredado */
+.grid3 > .card, .grid3 > .kpi{
+  margin:0 !important;
+  position:static !important;
+  transform:none !important;
+  z-index:0 !important;
+}
+.grid3 > .card::before, .grid3 > .card::after,
+.grid3 > .kpi::before,  .grid3 > .kpi::after{ content:none !important; }
+
+/* Tarjeta KPI = “barra” compacta */
+.kpi{
+  flex: 0 0 auto;              /* ancho según contenido */
+  width: auto;
+  min-width: 260px;            /* ajusta 240–300 a gusto */
+  max-width: 360px;
+  display: grid;
+  grid-template-columns: auto 1fr auto; /* Título | (espacio) | botón */
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+/* Solo título + número; sin franja intermedia */
+.kpi__head{ margin:0; font-weight:700; color:var(--muted); }
+.kpi__body{ display:none !important; }
+.kpi__num{
+  font-size: 20px;
+  font-weight: 800;
+  background: linear-gradient(90deg, var(--brand-blue), var(--brand-orange));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  justify-self: start;
+  margin-left: 6px;
+}
+
+/* Botón pequeño tipo “pill” a la derecha */
+.kpi__foot{ justify-self: end; }
+.kpi__foot .btn-ghost{
+  width: auto;
+  padding: 6px 10px;
+  font-size: 13px;
+  line-height: 1.1;
+  border-radius: 999px;
+}
+
+/* Responsive: quepan mejor en pantallas chicas */
+@media (max-width: 700px){
+  .kpi{ min-width: 100%; }
 }

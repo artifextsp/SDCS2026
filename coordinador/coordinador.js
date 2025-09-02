@@ -205,8 +205,17 @@ async function renderClasesSection() {
         ${items.map(c => `
           <div class="item" data-type="clase" data-id="${c.id}">
             <div class="item__meta" title="Fecha ejecución: ${c.fecha_ejecucion || '—'}">
-              <span class="item__title">Clase ${c.numero_clase} · ${escapeHtml(c.nombre || '')}</span>
-              <span class="item__desc">${escapeHtml(c.descripcion || '')}</span>
+              <span class="item__title">Clase ${c.numero_clase}</span>
+              <div class="item__fields">
+                <div class="field">
+                  <span class="field__label">Título:</span>
+                  <span class="field__value">${escapeHtml(c.nombre || '—')}</span>
+                </div>
+                <div class="field">
+                  <span class="field__label">Descripción:</span>
+                  <span class="field__value">${escapeHtml(c.descripcion || '—')}</span>
+                </div>
+              </div>
               ${c.publicado ? '<span class="badge">PUBLICADA</span>' : '<span class="badge badge--draft">BORRADOR</span>'}
               ${c.fecha_publicacion ? `<span class="badge">${new Date(c.fecha_publicacion).toLocaleDateString()}</span>` : ''}
             </div>
@@ -219,6 +228,7 @@ async function renderClasesSection() {
     </section>
   `;
 }
+
 
 function renderOpen() {
   if (current === 'qa')   return renderQASection();
