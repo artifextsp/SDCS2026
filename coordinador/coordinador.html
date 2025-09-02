@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Acceso Coordinador – SDCS</title>
+
+  <!-- Hoja base desde la raíz -->
+  <link rel="stylesheet" href="/base/styles.css" />
+  <!-- Hoja local del módulo (misma carpeta) -->
+  <link rel="stylesheet" href="./coordinador.css" />
+
+  <!-- Supabase v2 -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <main class="card card-auth">
+    <h1 class="h">Coordinador</h1>
+    <p class="p">Ingresa tu <strong>código</strong> de coordinador.</p>
+
+    <label for="codigo">Código</label>
+    <input id="codigo" class="input" type="text" inputmode="numeric" placeholder="000000" maxlength="6" />
+    <button id="btn">Entrar</button>
+    <div id="msg" class="msg" style="display:none"></div>
+  </main>
+
+  <!-- Lógica de acceso -->
+  <script type="module" src="./acceso-coordinador.js"></script>
+</body>
+</html>
