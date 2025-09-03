@@ -3,15 +3,17 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Dashboard Coordinación – SDCS</title>
+  <title>Dashboard Coordinación · SDCS</title>
 
-  <link rel="stylesheet" href="/base/styles.css" />
+  <!-- RUTAS RELATIVAS -->
+  <link rel="stylesheet" href="../base/styles.css" />
   <link rel="stylesheet" href="./coordinador.css" />
 
+  <!-- Supabase CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-  <main class="card card-dash">
+  <div class="card card-dash">
     <header class="dash__header">
       <div class="dash__left">
         <h1 class="h">Dashboard de Coordinación</h1>
@@ -19,8 +21,12 @@
       </div>
       <div class="dash__right">
         <div class="selects">
-          <label>Grado <select id="gradoSel"></select></label>
-          <label>Trimestre <select id="triSel"></select></label>
+          <label>Grado
+            <select id="gradoSel"></select>
+          </label>
+          <label>Trimestre
+            <select id="triSel"></select>
+          </label>
           <label>Estado
             <select id="pubSel">
               <option value="todos">Todos</option>
@@ -30,31 +36,45 @@
           </label>
         </div>
         <div class="search">
-          <input id="q" type="search" placeholder="Buscar por título, descripción…" />
-          <button id="btnRecargar" class="btn btn-accent">Recargar</button>
+          <input id="q" type="search" placeholder="Buscar por título, descrip..." />
+          <button id="btnRecargar" class="btn">Recargar</button>
         </div>
       </div>
     </header>
 
     <section class="grid3">
-      <article class="card kpi"><div class="kpi__head">Qué vamos a aprender</div><div class="kpi__body"><span id="kpiQA" class="kpi__num">0</span></div><div class="kpi__foot"><button id="btnQA" class="btn-ghost">Ver detalle</button></div></article>
-      <article class="card kpi"><div class="kpi__head">Proyecto</div><div class="kpi__body"><span id="kpiPROY" class="kpi__num">0</span></div><div class="kpi__foot"><button id="btnPROY" class="btn-ghost">Ver detalle</button></div></article>
-      <article class="card kpi"><div class="kpi__head">Clases</div><div class="kpi__body"><span id="kpiCLASES" class="kpi__num">0</span></div><div class="kpi__foot"><button id="btnCLASES" class="btn-ghost">Ver detalle</button></div></article>
+      <div class="kpi card">
+        <div class="kpi__head">Qué vamos a aprender</div>
+        <div class="kpi__num" id="kpiQA">0</div>
+        <div class="kpi__foot"><button id="btnQA" class="btn-ghost">Ver detalle</button></div>
+      </div>
+      <div class="kpi card">
+        <div class="kpi__head">Proyecto</div>
+        <div class="kpi__num" id="kpiPROY">0</div>
+        <div class="kpi__foot"><button id="btnPROY" class="btn-ghost">Ver detalle</button></div>
+      </div>
+      <div class="kpi card">
+        <div class="kpi__head">Clases</div>
+        <div class="kpi__num" id="kpiCLASES">0</div>
+        <div class="kpi__foot"><button id="btnCLASES" class="btn-ghost">Ver detalle</button></div>
+      </div>
     </section>
 
     <section id="panel" class="panel"></section>
-  </main>
+  </div>
 
+  <!-- Modal -->
   <div id="modal" class="modal" aria-hidden="true">
     <div class="modal__inner">
       <div class="modal__head">
         <h3 id="mTitle" class="h"></h3>
-        <button id="mClose" class="btn btn-ghost">Cerrar</button>
+        <button id="mClose" class="btn-ghost">Cerrar</button>
       </div>
       <div id="mBody" class="modal__body"></div>
     </div>
   </div>
 
+  <!-- RUTA RELATIVA -->
   <script type="module" src="./coordinador.js"></script>
 </body>
 </html>

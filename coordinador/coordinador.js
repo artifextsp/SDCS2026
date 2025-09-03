@@ -11,10 +11,10 @@ import { getCoordSession } from './coordAuth.js';
     if (params.get('debug') === '1') return; // acceso libre en dev
     const user = getCoordSession();
     if (!user || String(user.perfil).toUpperCase() !== 'COORDINADOR') {
-      window.location.assign('/coordinador/coordinador.html');
+      window.location.assign('./coordinador/coordinador.html');
     }
   } catch {
-    window.location.assign('/coordinador/coordinador.html');
+    window.location.assign('./coordinador/coordinador.html');
   }
 })();
 

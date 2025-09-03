@@ -1,19 +1,17 @@
 <!doctype html>
 <html lang="es">
 <head>
-  <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Acceso Coordinador · SDCS</title>
 
-  <!-- 👇 RUTAS CORRECTAS (sin slash al inicio) -->
-  <link rel="stylesheet" href="../base/styles.css?v=8" />
-  <link rel="stylesheet" href="./coordinador.css?v=8" />
+  <!-- CSS correctos (sin slash inicial) -->
+  <link rel="stylesheet" href="../base/styles.css?v=12" />
+  <link rel="stylesheet" href="./coordinador.css?v=12" />
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 
-</head>
 <body>
   <main class="card card-auth">
     <h1 class="h">Coordinador</h1>
@@ -21,11 +19,10 @@
 
     <label for="codigo">Código</label>
     <input id="codigo" class="input" type="text" inputmode="numeric" placeholder="000000" maxlength="6" />
-    <button id="btn">Entrar</button>
-    <div id="msg" class="msg" style="display:none"></div>
+    <button id="btn" class="btn">Entrar</button>
+    <div id="msg" class="msg" style="display:none;"></div>
   </main>
 
-  <!-- Lógica de acceso -->
-  <script type="module" src="./acceso-coordinador.js"></script>
+  <script type="module" src="./acceso-coordinador.js?v=12"></script>
 </body>
 </html>
