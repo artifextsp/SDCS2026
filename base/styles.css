@@ -49,3 +49,10 @@ button[disabled]{opacity:.6;cursor:not-allowed}
 .msg.ok{border-left-color:#4b5563}
 .msg.err{border-left-color:#1f2937}
 .footer{margin-top:18px;text-align:center;color:var(--muted);font-size:.9rem}
+
+.built-by{
+  margin:40px 0 24px;
+  text-align:center;
+  font-size:.9rem;
+  color:#667085;
+}

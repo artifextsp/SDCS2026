@@ -381,3 +381,9 @@ body{
   font-weight: 700;
   font-size: 0.98rem;
 }
+.built-by{
+  margin:40px 0 24px;
+  text-align:center;
+  font-size:.9rem;
+  color:#667085;
+}

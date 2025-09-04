@@ -75,3 +75,11 @@ hr.sep{border:none;border-top:1px dashed var(--border);margin:10px 0}
 .controls-box{border:1px solid var(--border);border-radius:12px;padding:10px;background:#fff;margin-top:10px}
 .controls-box legend{color:var(--accent-ink);font-weight:700;padding:0 6px}
 .controls-stack{display:flex;gap:8px;flex-wrap:wrap}
+
+.built-by{
+  margin:40px 0 24px;
+  text-align:center;
+  font-size:.9rem;
+  color:#667085;
+}
+

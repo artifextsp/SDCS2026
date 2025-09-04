@@ -260,3 +260,11 @@ select,input[type="search"],input[type="text"],input[type="date"]{
 @media (max-width: 700px){
   .kpi{ min-width: 100%; }
 }
+
+.built-by{
+  margin:40px 0 24px;
+  text-align:center;
+  font-size:.9rem;
+  color:#667085;
+}
+
